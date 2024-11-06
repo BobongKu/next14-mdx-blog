@@ -7,9 +7,10 @@ import { useSpyElem } from '@/hook/useSpy';
 import ThemeSwitch from '@/layouts/theme/Switch';
 import { cn } from '@/lib/utils';
 import { Github } from 'lucide-react';
+import { RESUME_DATA } from '@/data/resume-data';
 
 const navList = [
-  { name: 'D5BL5G', href: '/' },
+  { name: 'Bobong', href: '//'},
   { name: 'Posts', href: '/blog'},
   { name: 'About', href: '/about' },
 ];
@@ -18,12 +19,11 @@ const navList = [
 export const Header = () => {
   const { ref, marginTop } = useSpyElem(65);
   const pathname = usePathname();
-
   return (
     <nav
       style={{ marginTop }}
       ref={ref}
-      className='sticky top-0 z-40 bg-opacity-30 backdrop-blur-sm flex w-full flex-col items-center justify-center border-b dark:border-gray-600 border-gray-400 shadow-sm print:hidden '
+      className='dark:bg-black bg-slate-400 sticky top-0 z-40 bg-opacity-30 dark:bg-opacity-20 backdrop-blur-sm flex w-full flex-col items-center justify-center shadow-sm print:hidden '
     >
       <div className='flex h-[50px] w-full max-w-[1200px] items-center justify-between px-4'>
         <div className='flex items-center font-medium'>
@@ -46,7 +46,7 @@ export const Header = () => {
         <div className='flex gap-3'>
           <ThemeSwitch />
           <Button asChild variant='ghost' size='icon'>
-            <Link href='https://github.com/d5br5' target='_blank'>
+            <Link href={RESUME_DATA.contact.social[0].url} target='_blank'>
               <Github className='size-[1.2rem]' />
             </Link>
           </Button>

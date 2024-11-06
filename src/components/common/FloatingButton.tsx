@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 
-import CopyLinkButton from './CopyLinkButton';
 import { ScrollToComment, ScrollTop } from './TocButtons';
 import { Button } from '@/components/ui/button';
 import { useOutsideClick } from '@/hook/useOutsideClick';
@@ -28,10 +27,6 @@ const FloatingButton = () => {
         >
           <Bolt size={22} />
         </Button>
-        <CopyLinkButton
-          size={22}
-          className={cn('absolute bottom-0 right-0 transition', visible && '-translate-y-12')}
-        />
         <ScrollToComment
           size={22}
           className={cn('absolute bottom-0 right-0 transition', visible && '-translate-y-24')}

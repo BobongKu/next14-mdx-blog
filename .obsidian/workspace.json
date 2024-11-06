@@ -1,0 +1,168 @@
+{
+  "main": {
+    "id": "fc0e460eccc11e1d",
+    "type": "split",
+    "children": [
+      {
+        "id": "e14af33003df6769",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "aaab7e8fbb262a40",
+            "type": "leaf",
+            "state": {
+              "type": "image",
+              "state": {
+                "file": "public/posts/nextjs_blog/giscus/3.png"
+              },
+              "icon": "lucide-image",
+              "title": "3"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "51899bbdd8aad49f",
+    "type": "split",
+    "children": [
+      {
+        "id": "a3f4ac8852c00625",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "34567306e9f15091",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-folder-closed",
+              "title": "파일 탐색기"
+            }
+          },
+          {
+            "id": "beef0b428d2e080f",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "검색"
+            }
+          },
+          {
+            "id": "2121103f763bb575",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "5734ce36c8884174",
+    "type": "split",
+    "children": [
+      {
+        "id": "c89595ae17325995",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "2dd5e7ddccacd081",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "public/posts/nextjs_blog/giscus/3.png",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "3의 백링크"
+            }
+          },
+          {
+            "id": "c76933cb09467146",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "public/posts/nextjs_blog/giscus/3.png",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "3의 나가는 링크"
+            }
+          },
+          {
+            "id": "f3188c9e76709148",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "f41bf3bf267c5539",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "public/posts/nextjs_blog/giscus/3.png"
+              },
+              "icon": "lucide-list",
+              "title": "3 개요"
+            }
+          }
+        ],
+        "currentTab": 3
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:퀵 스위처 열기": false,
+      "graph:그래프 뷰 열기": false,
+      "canvas:새 캔버스 만들기": false,
+      "daily-notes:오늘의 데일리 노트 열기": false,
+      "templates:템플릿 삽입": false,
+      "command-palette:명령어 팔레트 열기": false
+    }
+  },
+  "active": "f41bf3bf267c5539",
+  "lastOpenFiles": [
+    "public/posts/nextjs_blog/giscus/1.png",
+    "public/posts/nextjs_blog/giscus/2.png"
+  ]
+}

@@ -9,10 +9,9 @@ type Props = {
 };
 
 // 허용된 param 외 접근시 404
-export const dynamicParams = false;
 
-export function generateStaticParams() {
-  const categoryList = getCategoryList();
+export async function generateStaticParams() {
+  const categoryList = await getCategoryList();
   const paramList = categoryList.map((category) => ({ category }));
   return paramList;
 }
@@ -37,7 +36,6 @@ export async function generateMetadata({ params: { category } }: Props): Promise
 }
 
 const CategoryPage = async ({ params:{category}}: Props) => {
-  console.log(category)
   return <PostListPage category={category} />;
 };
 

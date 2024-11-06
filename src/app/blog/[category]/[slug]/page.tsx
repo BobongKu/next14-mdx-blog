@@ -63,7 +63,6 @@ const PostDetail = async ({ params: { category, slug } }: Props) => {
       </article>
       <hr />
       <Giscus />
-      <FloatingButton />
     </div>
   );
 };
