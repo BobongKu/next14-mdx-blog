@@ -1,7 +1,7 @@
-import Link from 'next/link';
 
 import { Post } from '@/config/types';
 import { CalendarDays, Clock3, Eye } from 'lucide-react';
+import { TransitionLink } from '../common/TransitionLink';
 
 interface Props {
   post: Post;
@@ -12,12 +12,14 @@ export const PostHeader = ({ post }: Props) => {
     <header className='mt-14 text-center'>
       <h1 className='mb-5 text-3xl'>{post.title}</h1>
       <div className='mb-3 text-base'>
-        <Link
+        <TransitionLink
           href={`/blog/${post.categoryPath}`}
-          className='font-semibold text-pink-600 no-underline underline-offset-4 hover:underline'
         >
-          {post.categoryPublicName}
-        </Link>
+          <div className='font-semibold text-pink-600 no-underline underline-offset-4 hover:underline'
+          >
+           {post.categoryPublicName}
+          </div>
+        </TransitionLink>
       </div>
       <div className='flex justify-center gap-3 text-sm text-gray-500 dark:text-gray-400'>
         <div className='flex items-center gap-1'>

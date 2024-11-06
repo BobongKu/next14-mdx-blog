@@ -87,3 +87,14 @@
     text-wrap: balance;
   }
 }
+
+body {
+  transition-property: opacity, background, transform, filter;
+  transition-timing-function: ease-in-out;
+  transition-duration: 50ms;
+}
+
+.page-transition {
+  opacity: 20;
+  filter: blur(1px);
+}

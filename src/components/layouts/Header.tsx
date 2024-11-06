@@ -4,10 +4,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useSpyElem } from '@/hook/useSpy';
-import ThemeSwitch from '@/layouts/theme/Switch';
+import ThemeSwitch from '@/components/layouts/theme/Switch';
 import { cn } from '@/lib/utils';
 import { Github } from 'lucide-react';
 import { RESUME_DATA } from '@/data/resume-data';
+import { TransitionLink } from '../common/TransitionLink';
 
 const navList = [
   { name: 'Bobong', href: '//'},
@@ -28,18 +29,19 @@ export const Header = () => {
       <div className='flex h-[50px] w-full max-w-[1200px] items-center justify-between px-4'>
         <div className='flex items-center font-medium'>
           {navList.map((navItem) => (
-            <Link
+            <TransitionLink
               href={navItem.href}
               key={navItem.name}
-              className={cn(
+          >
+              <div className={cn(
                 'rounded-full px-4 text-center text-sm transition-colors hover:text-primary',
                 pathname?.startsWith(navItem.href)
                   ? 'bg-muted font-medium text-primary'
                   : 'text-muted-foreground'
-              )}
-            >
-              {navItem.name}
-            </Link>
+              )}>
+                {navItem.name}
+              </div>
+            </TransitionLink>
           ))}
         </div>
 

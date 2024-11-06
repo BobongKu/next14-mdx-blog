@@ -3,9 +3,9 @@ import type { Metadata } from 'next';
 import { Toaster } from '@/components/ui/toaster';
 import { baseDomain, blogDesc, blogName, blogThumbnailURL } from '@/config/const';
 import '@/config/globals.css';
-import { Footer } from '@/layouts/Footer';
-import { Header } from '@/layouts/Header';
-import { ThemeProvider } from '@/layouts/theme/Provider';
+import { Footer } from '@/components/layouts/Footer';
+import { Header } from '@/components/layouts/Header';
+import { ThemeProvider } from '@/components/layouts/theme/Provider';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
