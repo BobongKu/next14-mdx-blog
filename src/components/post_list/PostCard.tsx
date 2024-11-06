@@ -48,7 +48,7 @@ const PostCard = ({ post }: Props) => {
             </div>
           </div>
         </div>
-      </li>ss
+      </li>
     </Link>
   );
 };
