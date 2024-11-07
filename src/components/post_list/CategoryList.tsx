@@ -35,7 +35,7 @@ const CategoryList = ({
 
   return (
     <>
-      <section className='mb-10 hidden sm:block'>
+      <section className='mb-10  block'>
         <ul className='flex gap-3'>
           <CategoryButton
             href='/post'
@@ -53,21 +53,6 @@ const CategoryList = ({
             />
           ))}
         </ul>
-      </section>
-      <section className='mb-10 sm:hidden'>
-        <Select onValueChange={onCategoryChange} defaultValue={currentCategory}>
-          <SelectTrigger className='w-[180px]'>
-            <SelectValue placeholder='Theme' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='all'>All ({allPostCount})</SelectItem>
-            {categoryList.map((cg) => (
-              <SelectItem key={cg.dirName} value={cg.dirName}>
-                {cg.publicName} ({cg.count})
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </section>
     </>
   );

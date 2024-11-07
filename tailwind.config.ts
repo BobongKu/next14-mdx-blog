@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+const defaultTheme = require("tailwindcss/defaultTheme");
 
 const config = {
   darkMode: ['class'],
@@ -62,6 +63,12 @@ const config = {
       typography: {
         DEFAULT: {
           css: {
+            "code::before": {
+							content: '""',
+						},
+						"code::after": {
+							content: '""',
+						},
             'h2, h3, h4': {
               scrollMarginTop: '5rem',
             },
@@ -91,14 +98,6 @@ const config = {
               padding: '0.2em 0.4em',
               overflowWrap: 'break-word',
             },
-
-            'code::before': {
-              content: 'none',
-            },
-            'code::after': {
-              content: 'none',
-            },
-
             'code[data-line-numbers] > [data-line]::before': {
               counterIncrement: 'line',
               content: 'counter(line)',
@@ -164,6 +163,12 @@ const config = {
               fontWeight: 600,
             },
           },
+          quoteless: {
+            css: {
+              "blockquote p:first-of-type::before": { content: "none" },
+              "blockquote p:first-of-type::after": { content: "none" },
+            },
+          },
         },
       },
       borderRadius: {
@@ -171,6 +176,10 @@ const config = {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
+      backgroundImage: {
+				"gradient-radial":
+					"radial-gradient(50% 50% at 50% 50%, var(--tw-gradient-stops))",
+			},
       keyframes: {
         'accordion-down': {
           from: { height: '0' },
@@ -188,11 +197,75 @@ const config = {
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        roll: "roll 15s linear infinite"     
+        roll: "roll 15s linear infinite",
+        "fade-in": "fade-in 3s ease-in-out forwards",
+				title: "title 3s ease-out forwards",
+				"fade-left": "fade-left 3s ease-in-out forwards",
+				"fade-right": "fade-right 3s ease-in-out forwards",     
       },
+      keyframes: {
+				"fade-in": {
+					"0%": {
+						opacity: "0%",
+					},
+					"75%": {
+						opacity: "0%",
+					},
+					"100%": {
+						opacity: "100%",
+					},
+				},
+				"fade-left": {
+					"0%": {
+						transform: "translateX(100%)",
+						opacity: "0%",
+					},
+
+					"30%": {
+						transform: "translateX(0%)",
+						opacity: "100%",
+					},
+					"100%": {
+						opacity: "0%",
+					},
+				},
+				"fade-right": {
+					"0%": {
+						transform: "translateX(-100%)",
+						opacity: "0%",
+					},
+
+					"30%": {
+						transform: "translateX(0%)",
+						opacity: "100%",
+					},
+					"100%": {
+						opacity: "0%",
+					},
+				},
+				title: {
+					"0%": {
+						"line-height": "0%",
+						"letter-spacing": "0.25em",
+						opacity: "0",
+					},
+					"25%": {
+						"line-height": "0%",
+						opacity: "0%",
+					},
+					"80%": {
+						opacity: "100%",
+					},
+
+					"100%": {
+						"line-height": "100%",
+						opacity: "100%",
+					},
+				},
+			},
     },
   },
-  plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
+  plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography'),],
 } satisfies Config;
 
 export default config;

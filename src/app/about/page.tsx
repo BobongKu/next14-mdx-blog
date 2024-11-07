@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Section } from '@/components/ui/section';
 import { Award, GlobeIcon, MailIcon } from 'lucide-react';
 import { RESUME_DATA } from '@/data/resume-data';
+import Particles from '@/components/ui/particles';
 
 
 
