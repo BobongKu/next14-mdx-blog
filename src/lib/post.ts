@@ -1,4 +1,3 @@
-import PostListPage from '@/components/post_list/PostListPage';
 import { CategoryDetail, HeadingItem, Post, PostMatter } from '@/config/types';
 import dayjs from 'dayjs';
 import fs from 'fs';
