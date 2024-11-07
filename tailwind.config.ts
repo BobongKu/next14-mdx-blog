@@ -18,6 +18,18 @@ const config = {
         pretendard: ['SUIT-Regular'],
       },
       keyframes: {
+        'accordion-down': {
+          from: { height: '0' },
+          to: { height: 'var(--radix-accordion-content-height)' },
+        },
+        'accordion-up': {
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: '0' },
+        },
+        roll:{
+          "0%": {transform: "translateX(100%)"},
+          "100%": {transform: "translateX(-100%)"}
+        },
 				"fade-in": {
 					"0%": {
 						opacity: "0%",
@@ -241,18 +253,7 @@ const config = {
 					"radial-gradient(50% 50% at 50% 50%, var(--tw-gradient-stops))",
 			},
       keyframes: {
-        'accordion-down': {
-          from: { height: '0' },
-          to: { height: 'var(--radix-accordion-content-height)' },
-        },
-        'accordion-up': {
-          from: { height: 'var(--radix-accordion-content-height)' },
-          to: { height: '0' },
-        },
-        roll:{
-          "0%": {transform: "translateX(100%)"},
-          "100%": {transform: "translateX(-100%)"}
-        }
+        
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
