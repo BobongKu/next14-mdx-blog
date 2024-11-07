@@ -14,7 +14,7 @@ const config = {
     },
     extend: {
       fontFamily: {
-        pretendard: ['Pretendard'],
+        pretendard: ['SUIT-Regular'],
       },
       colors: {
         border: 'hsl(var(--border))',

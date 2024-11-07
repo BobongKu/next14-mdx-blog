@@ -27,9 +27,9 @@ const CategoryList = ({
 
   const onCategoryChange = (value: string) => {
     if (value === 'all') {
-      router.push('/blog');
+      router.push('/post');
     } else {
-      router.push(`/blog/${value}`);
+      router.push(`/post/${value}`);
     }
   };
 
@@ -38,7 +38,7 @@ const CategoryList = ({
       <section className='mb-10 hidden sm:block'>
         <ul className='flex gap-3'>
           <CategoryButton
-            href='/blog'
+            href='/post'
             isCurrent={currentCategory === 'all'}
             displayName='All'
             count={allPostCount}
@@ -46,7 +46,7 @@ const CategoryList = ({
           {categoryList.map((cg) => (
             <CategoryButton
               key={cg.dirName}
-              href={`/blog/${cg.dirName}`}
+              href={`/post/${cg.dirName}`}
               displayName={cg.publicName}
               isCurrent={cg.dirName === currentCategory}
               count={cg.count}

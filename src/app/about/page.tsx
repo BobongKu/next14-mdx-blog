@@ -6,14 +6,14 @@ import { Button } from '@/components/ui/button';
 import * as D from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Section } from '@/components/ui/section';
-import { GlobeIcon, MailIcon } from 'lucide-react';
+import { Award, GlobeIcon, MailIcon } from 'lucide-react';
 import { RESUME_DATA } from '@/data/resume-data';
 
 
 
 export function generateMetadata(): Metadata {
   return {
-    title: `${RESUME_DATA?.name} | ${RESUME_DATA?.about}`,
+    title: `${RESUME_DATA?.name} | About`,
     description: RESUME_DATA?.summary,
   };
 }
@@ -91,6 +91,12 @@ export default async function AboutPage() {
           </p>
         </Section>
         <Section>
+          <h2 className='text-2xl font-bold'>My Team</h2>
+          <p className='text-pretty leading-8 text-muted-foreground print:text-[12px]'>
+            {RESUME_DATA?.team}
+          </p>
+        </Section>
+        <Section>
           <h2 className='text-2xl font-bold'>Skills</h2>
           <div className='flex flex-wrap gap-1'>
             {RESUME_DATA?.skills.map((skill) => (
@@ -99,6 +105,14 @@ export default async function AboutPage() {
               </Badge>
             ))}
           </div>
+        </Section>
+        <Section>
+          <h2 className='text-2xl font-bold'>Awards</h2>
+            {RESUME_DATA?.awards.map((award)=>(
+              <li key={award} className='text-pretty leading-8 text-muted-foreground print:text-[12px]'>
+                {award}
+              </li>
+            ))}
         </Section>
       </Section>
     </main>

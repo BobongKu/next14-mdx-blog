@@ -32,7 +32,12 @@ const TableOfContent = ({ toc }: Props) => {
                     'py-1 transition'
                   )}
                 >
-                  <Link href={item.link}>{item.text}</Link>
+                  <Link href={item.link}>
+                  <span className="group text-black dark:text-white transition-all duration-300 ease-in-out">
+            <span className="bg-left-bottom bg-gradient-to-r from-black to-white dark:from-white dark:to-black bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-500 ease-out">
+            {item.text}
+            </span>
+            </span></Link>
                 </li>
               );
             })}

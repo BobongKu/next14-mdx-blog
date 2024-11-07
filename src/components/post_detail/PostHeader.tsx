@@ -1,6 +1,6 @@
 
 import { Post } from '@/config/types';
-import { CalendarDays, Clock3, Eye } from 'lucide-react';
+import { CalendarDays, Clock3 } from 'lucide-react';
 import { TransitionLink } from '../common/TransitionLink';
 
 interface Props {
@@ -10,15 +10,16 @@ interface Props {
 export const PostHeader = ({ post }: Props) => {
   return (
     <header className='mt-14 text-center'>
-      <h1 className='mb-5 text-3xl'>{post.title}</h1>
-      <div className='mb-3 text-base'>
+      <h1 className='mb-3 text-3xl'>{post.title}</h1>
+      <div className='mb-3'>
         <TransitionLink
-          href={`/blog/${post.categoryPath}`}
+          href={`/post/${post.categoryPath}`}
         >
-          <div className='font-semibold text-pink-600 no-underline underline-offset-4 hover:underline'
-          >
-           {post.categoryPublicName}
-          </div>
+          <span className="group text-black dark:text-white transition-all duration-300 ease-in-out">
+            <span className="bg-left-bottom bg-gradient-to-r from-black to-white dark:from-white dark:to-black bg-[length:0%_2px] bg-no-repeat group-hover:bg-[length:100%_2px] transition-all duration-500 ease-out">
+              {post.categoryPublicName}
+            </span>
+          </span>
         </TransitionLink>
       </div>
       <div className='flex justify-center gap-3 text-sm text-gray-500 dark:text-gray-400'>

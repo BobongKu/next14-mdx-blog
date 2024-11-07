@@ -15,9 +15,11 @@ const ThemeSwitch = () => {
 
   return (
       <button  onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
-        {
-          theme === "light" ? <MoonIcon/>  : <SunIcon/>
-        }
+        <p>
+          {
+            theme === "light" ? <MoonIcon/>  : <SunIcon/>
+          }
+        </p>
       </button>
   );
 };

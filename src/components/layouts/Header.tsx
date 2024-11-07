@@ -12,7 +12,7 @@ import { TransitionLink } from '../common/TransitionLink';
 
 const navList = [
   { name: 'Bobong', href: '//'},
-  { name: 'Posts', href: '/blog'},
+  { name: 'Posts', href: '/post'},
   { name: 'About', href: '/about' },
 ];
 

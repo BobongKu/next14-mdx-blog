@@ -35,7 +35,7 @@ export const parsePostAbstract = (postPath: string) => {
     .replace(`${BASE_PATH}/`, '')
     .replace('.mdx', '');
   const [categoryPath, slug] = filePath.split('/');
-  const url = `/blog/${categoryPath}/${slug}`;
+  const url = `/post/${categoryPath}/${slug}`;
   const categoryPublicName = getCategoryPublicName(categoryPath);
   return { url, categoryPath, categoryPublicName, slug };
 };
@@ -74,7 +74,7 @@ export const getSortedPostList = async (category?: string) => {
 
 export const getSitemapPostList = async () => {
   const postList = await getPostList();
-  const baseUrl = 'https://www.d5br5.dev';
+  const baseUrl = 'https://bobong.blog';
   const sitemapPostList = postList.map(({ url }) => ({
     lastModified: new Date(),
     url: `${baseUrl}${url}`,

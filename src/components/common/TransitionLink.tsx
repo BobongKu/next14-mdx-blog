@@ -3,8 +3,7 @@
 import Link, {LinkProps} from "next/link"
 import { ReactNode } from "react"
 import { useRouter } from "next/navigation"
-import { resolveObjectURL } from "buffer"
-import { resolve } from "path"
+
 
 interface TransitionLinkProps extends LinkProps {
     children: ReactNode
@@ -30,9 +29,9 @@ export const TransitionLink = ({
         const body = document.querySelector("body")
 
         body?.classList.add("page-transition")
-        await sleep(200)
+        await sleep(50)
         router.push(href)
-        await sleep(200)
+        await sleep(50)
         body?.classList.remove("page-transition")
 
     }
