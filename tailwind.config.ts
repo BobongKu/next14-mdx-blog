@@ -256,7 +256,7 @@ const config = {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         roll: "roll 15s linear infinite",
-        "fade-in": "fade-in 3s ease-in-out forwards",
+        "fade-in": "fade-in 1s ease-in-out forwards",
 				title: "title 3s ease-out forwards",
 				"fade-left": "fade-left 3s ease-in-out forwards",
 				"fade-right": "fade-right 3s ease-in-out forwards",     

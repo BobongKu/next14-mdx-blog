@@ -39,10 +39,7 @@ export default function RootLayout({
       <body className='font-pretendard flex min-h-screen flex-col'>
         <ThemeProvider>
           <Header />
-          <Particles
-            className="absolute inset-0 -z-10"
-            quantity={100}
-          />
+          <Particles className="absolute inset-0 -z-10" quantity={100}/>
           <main className='mt-[64px] flex flex-1 flex-col'>{children}</main>
           <Footer />
         </ThemeProvider>
