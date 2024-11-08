@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
-import { SunIcon, MoonIcon } from '../Icons';
+import { SunIcon, MoonIcon } from '../../icon/Icons';
 
 const ThemeSwitch = () => {
   const [mounted, setMounted] = useState(false);
