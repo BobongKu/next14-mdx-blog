@@ -6,7 +6,7 @@ thumbnail: /web_basic_thumbnail.jpg
 ---
 ## What's HTTP request Smuggling?
 
-![](/posts/web_basic/HTTP_Request_Smuggling/0.png)
+![](/posts/web_basic/http_request_smuggling/0.png)
 
 HTTP request Smuggling은 웹 서버나 프록시 서버와 같은 HTTP 요청을 처리하는 시스템에서 발생하는 보안 취약점 중 하나입니다.
 
@@ -55,7 +55,7 @@ Front-end가 HTTP/2를 사용하고 Back-end가 HTTP/1.1을 사용할 때 이뤄
 
 ### CL : TE
 
-![](/posts/web_basic/HTTP_Request_Smuggling/1.png)
+![](/posts/web_basic/http_request_smuggling/1.png)
 
 Front-end 서버는 Content-Length 헤더를 사용하고, Back-end 서버에서는  Transfer-Encoding 헤더를 사용할 때 발생하는 취약점입니다.
 
@@ -83,7 +83,7 @@ Host: test.com
 
 ### TE : CL
 
-![](/posts/web_basic/HTTP_Request_Smuggling/2.png)
+![](/posts/web_basic/http_request_smuggling/2.png)
 
 Front-end 서버는 Transfer-Encoding 헤더를 사용하고, Back-end 서버에서는  Content-Length 헤더를 사용할 때 발생하는 취약점입니다.
 
@@ -106,7 +106,7 @@ Back-end 서버에서는 `Content-Length` 의 길이가 3이기 때문에 `8`까
 
 ### TE : TE
 
-![](/posts/web_basic/HTTP_Request_Smuggling/3.png)
+![](/posts/web_basic/http_request_smuggling/3.png)
 
 Front-end와 Back-end 모두 `Transfer-Encoding`을 사용할 때 발생하는 취약점입니다.
 
@@ -137,7 +137,7 @@ TE : TE 취약점은 Front-end 서버와 Back-end 서버 중 하나가 `Transfer
 
 ### H2.CL
 
-![](/posts/web_basic/HTTP_Request_Smuggling/4.png)
+![](/posts/web_basic/http_request_smuggling/4.png)
 
 HTTP/2 에선 `Content-Length`를 명시할 필요가 없으나 HTTP/1.1로 다운그레이드 될 경우, Front-end 서버에 `Content-Length` 헤더를 명시하여 취약점을 발생시킬 수 있습니다.
 
@@ -161,7 +161,7 @@ Back-end 서버에서는 다운그레이드를 통해 HTTP/1.1 HTTP request를 �
 
 ### H2.TE
 
-![](/posts/web_basic/HTTP_Request_Smuggling/5.png)
+![](/posts/web_basic/http_request_smuggling/5.png)
 
 HTTP/2 에선 `Transfer-Encoding` 헤더가 적용되지 않습니다.
 
@@ -183,7 +183,7 @@ Back-end 서버에선 다운그레이드를 통해 `transfer-encoding: chunked` 
 
 ### CL.0
 
-![](/posts/web_basic/HTTP_Request_Smuggling/6.png)
+![](/posts/web_basic/http_request_smuggling/6.png)
 
 CL.0 request Smuggling은 Front-end에서는 `Content-Length` 헤더를 사용하지만 Back-end 서버에서 `Content-Length` 헤더를 무시하는 경우 발생하는 취약점입니다. 
 
