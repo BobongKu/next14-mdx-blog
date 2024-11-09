@@ -145,17 +145,19 @@ const config = {
               scrollMarginTop: '5rem',
             },
             p: {
-              marginTop: '2rem',
-              marginBottom: '2rem',
+              marginTop: '1rem',
+              marginBottom: '1rem',
             },
             '.callout-contents > p': {
               margin: 0,
             },
-
             code: {
               counterReset: 'line',
             },
-
+            figure: {
+              marginTop: '1rem',
+              marginBottom: '2rem',
+            },
             // Inline code only
             ':not(pre) > code': {
               fontWeight: 'inherit',

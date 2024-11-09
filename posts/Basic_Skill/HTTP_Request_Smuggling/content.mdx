@@ -6,12 +6,13 @@ thumbnail: /web_basic_thumbnail.jpg
 ---
 ## What's HTTP request Smuggling?
 
-![](/posts/web_basic/http_request_smuggling/0.png)
+![](/posts/basic_skill/http_request_smuggling/0.png)
 
 HTTP request Smuggling은 웹 서버나 프록시 서버와 같은 HTTP 요청을 처리하는 시스템에서 발생하는 보안 취약점 중 하나입니다.
 
 Front-end 서버와 Back-end 서버가 서로 다른 방식으로 HTTP 요청의 길이를 처리할 때 HTTP requset Smuggling 취약점이 발생할 수 있습니다.
 
+---
 ## Background
 
 ### Content-Length
@@ -51,11 +52,11 @@ Front-end가 HTTP/2를 사용하고 Back-end가 HTTP/1.1을 사용할 때 이뤄
 [HTTP/2 downgrading | Web Security Academy](https://portswigger.net/web-security/request-smuggling/advanced/http2-downgrading)
 
 ---
-## web_basic Attack
+## Basic Attack
 
 ### CL : TE
 
-![](/posts/web_basic/http_request_smuggling/1.png)
+![](/posts/basic_skill/http_request_smuggling/1.png)
 
 Front-end 서버는 Content-Length 헤더를 사용하고, Back-end 서버에서는  Transfer-Encoding 헤더를 사용할 때 발생하는 취약점입니다.
 
@@ -83,7 +84,7 @@ Host: test.com
 
 ### TE : CL
 
-![](/posts/web_basic/http_request_smuggling/2.png)
+![](/posts/basic_skill/http_request_smuggling/2.png)
 
 Front-end 서버는 Transfer-Encoding 헤더를 사용하고, Back-end 서버에서는  Content-Length 헤더를 사용할 때 발생하는 취약점입니다.
 
@@ -106,7 +107,7 @@ Back-end 서버에서는 `Content-Length` 의 길이가 3이기 때문에 `8`까
 
 ### TE : TE
 
-![](/posts/web_basic/http_request_smuggling/3.png)
+![](/posts/basic_skill/http_request_smuggling/3.png)
 
 Front-end와 Back-end 모두 `Transfer-Encoding`을 사용할 때 발생하는 취약점입니다.
 
@@ -137,7 +138,7 @@ TE : TE 취약점은 Front-end 서버와 Back-end 서버 중 하나가 `Transfer
 
 ### H2.CL
 
-![](/posts/web_basic/http_request_smuggling/4.png)
+![](/posts/basic_skill/http_request_smuggling/4.png)
 
 HTTP/2 에선 `Content-Length`를 명시할 필요가 없으나 HTTP/1.1로 다운그레이드 될 경우, Front-end 서버에 `Content-Length` 헤더를 명시하여 취약점을 발생시킬 수 있습니다.
 
@@ -161,7 +162,7 @@ Back-end 서버에서는 다운그레이드를 통해 HTTP/1.1 HTTP request를 �
 
 ### H2.TE
 
-![](/posts/web_basic/http_request_smuggling/5.png)
+![](/posts/basic_skill/http_request_smuggling/5.png)
 
 HTTP/2 에선 `Transfer-Encoding` 헤더가 적용되지 않습니다.
 
@@ -183,7 +184,7 @@ Back-end 서버에선 다운그레이드를 통해 `transfer-encoding: chunked` 
 
 ### CL.0
 
-![](/posts/web_basic/http_request_smuggling/6.png)
+![](/posts/basic_skill/http_request_smuggling/6.png)
 
 CL.0 request Smuggling은 Front-end에서는 `Content-Length` 헤더를 사용하지만 Back-end 서버에서 `Content-Length` 헤더를 무시하는 경우 발생하는 취약점입니다. 
 
@@ -226,6 +227,7 @@ X
 
 `0` 이 존재하지 않기 때문에 Back-end로 신호가 가지 못해 Reject를 응답하거나, Back-end에서 `0` 이 존재하지 않기 때문에 계속해서 기다리다가 Timeout을 응답하는 것입니다.
 
+---
 ## Special Attack
 
 ### Front-end 접근제어 우회
@@ -341,7 +343,6 @@ Foo: X
 ```
 
 ### CRLF Injection을 통한 HTTP/2 Request Smuggling
-
 Content-Length, Transfer-Encoding 헤더를 필터링하여 H2.CL, H2,TE 공격을 방지하여도 CRLF Injection을 통해 공격이 가능합니다.
 
 HTTP/1.1와 다르게 HTTP/2는 헤더 내용에 콜론이 사용 가능하여 CRLF Injection과 같이 사용하여 필터링을 우회할 수 있습니다.
@@ -349,7 +350,6 @@ HTTP/1.1와 다르게 HTTP/2는 헤더 내용에 콜론이 사용 가능하여 C
 해당 방법이 가능한 이유는 HTTP/2가 문자열이 아닌 바이너리 기반으로 동작하기 때문에 `\r\n`을 인식하지 못하기 때문입니다.
 
 아래는 간단한 예시입니다.
-
 ```text
 Front-end HTTP/2
 foo: bar \r\n Transfer-Encoding: chunked \r\n X: ignore
@@ -360,19 +360,15 @@ Transfer-Encoding: chunked\r\n
 X: ignore\r\n
 ```
 
-
 ---
 ## Reference
-
-[What is HTTP request smuggling? Tutorial & Examples | Web Security Academy](https://portswigger.net/web-security/request-smuggling)
-[HTTP Request Smuggling](https://www.hahwul.com/cullinan/http-request-smuggling/)
-[HTTP Request Smuggling / HTTP Desync Attack | Korean - Ht | HackTricks](https://book.hacktricks.xyz/v/kr/pentesting-web/http-request-smuggling)
-[HTTP request smuggling 개념 정리 및 실제 공격](https://velog.io/@thelm3716/HTTP-request-smuggling)
-[HTTP Request Smuggling & HTTP Desync Attack](https://core-research-team.github.io/2020-05-01/HTTP-Request-Smuggling-HTTP-Desync-Attack-be0e1c6035f84533af79463b3ec49d75)
-
+https://portswigger.net/web-security/request-smuggling
+https://www.hahwul.com/cullinan/http-request-smuggling/
+https://book.hacktricks.xyz/v/kr/pentesting-web/http-request-smuggling
+https://velog.io/@thelm3716/HTTP-request-smuggling
+https://core-research-team.github.io/2020-05-01/HTTP-Request-Smuggling-HTTP-Desync-Attack-be0e1c6035f84533af79463b3ec49d75
 
 ---
 ## Lab
-
 [HTTP Request Smuggling Workshop](https://gosecure.github.io/request-smuggling-workshop/#0)
 [https://github.com/detectify/Varnish-H2-Request-Smuggling](https://github.com/detectify/Varnish-H2-Request-Smuggling)
