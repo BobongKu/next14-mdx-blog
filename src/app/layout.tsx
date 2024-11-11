@@ -37,9 +37,9 @@ export default function RootLayout({
   return (
     <html lang='en' className='h-full scroll-my-20 scroll-smooth' suppressHydrationWarning>
       <body className='font-pretendard flex min-h-screen flex-col'>
+        <Particles className="absolute inset-0 -z-10" quantity={300}/>
         <ThemeProvider>
           <Header />
-          <Particles className="absolute inset-0 -z-10" quantity={300}/>
           <main className='mt-[64px] flex flex-1 flex-col'>{children}</main>
           <Footer />
         </ThemeProvider>
