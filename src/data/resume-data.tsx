@@ -7,7 +7,7 @@ export const RESUME_DATA = {
   locationLink: 'https://www.google.com/maps/place/seoul',
   about: 'White H4cker 😎',
   summary:
-    '대학교 4학년부터 해킹을 배우기 시작해서 현재는 모의해킹 전문가로 활동하고 있습니다.',
+    '대학교 4학년부터 해킹을 배우기 시작해서 현재는 모의해킹 전문가로 활동하고 있습니다. 간간히 정보보안 관련 정보를 정리해서 올리고 있으니 도움이 되셨으면 좋겠습니다. 👍',
   avatarUrl: 'https://avatars.githubusercontent.com/u/42234678?v=4',
   contact: {
     email: 'jhbgjy7@gmail.com',
