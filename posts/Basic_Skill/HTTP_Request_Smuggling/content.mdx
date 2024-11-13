@@ -52,6 +52,25 @@ Front-end가 HTTP/2를 사용하고 Back-end가 HTTP/1.1을 사용할 때 이뤄
 [HTTP/2 downgrading | Web Security Academy](https://portswigger.net/web-security/request-smuggling/advanced/http2-downgrading)
 
 ---
+## Detection
+
+HTTP request Smuggling은 request의 결과를 통해 탐지가 가능하다.
+
+```text
+Content-Length: 6
+Transfer-Encoding: chunked
+
+3
+abc
+X
+
+```
+
+위와 같이 요청을 보냈을 때 response 결과 값이 Reject 면 TE : CL 또는 TE : TE이고, Timeout이면 CL : TE 이다.
+
+`0` 이 존재하지 않기 때문에 Back-end로 신호가 가지 못해 Reject를 응답하거나, Back-end에서 `0` 이 존재하지 않기 때문에 계속해서 기다리다가 Timeout을 응답하는 것입니다.
+
+---
 ## Basic Attack
 
 ### CL : TE
@@ -207,28 +226,8 @@ X-Ignore: x
 
 해당 공격은 Content-Length 길이를 임의로 조작하지 않기 때문에 JavaScript를 통해서도 공격을 진행할 수 있다.
 
-
 ---
-## Detection
-
-HTTP request Smuggling은 request의 결과를 통해 탐지가 가능하다.
-
-```text
-Content-Length: 6
-Transfer-Encoding: chunked
-
-3
-abc
-X
-
-```
-
-위와 같이 요청을 보냈을 때 response 결과 값이 Reject 면 TE : CL 또는 TE : TE이고, Timeout이면 CL : TE 이다.
-
-`0` 이 존재하지 않기 때문에 Back-end로 신호가 가지 못해 Reject를 응답하거나, Back-end에서 `0` 이 존재하지 않기 때문에 계속해서 기다리다가 Timeout을 응답하는 것입니다.
-
----
-## Special Attack
+## Advanced Attack
 
 ### Front-end 접근제어 우회
 

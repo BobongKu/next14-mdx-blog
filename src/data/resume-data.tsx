@@ -3,6 +3,7 @@ import IconGithub from '@/components/icon/Github';
 export const RESUME_DATA = {
   name: 'Bobong',
   initials: 'Bo',
+  oldLink:'https://notion-next-x-bobongkus-projects.vercel.app/',
   location: '대한민국 서울특별시',
   locationLink: 'https://www.google.com/maps/place/seoul',
   about: 'White H4cker 😎',

@@ -9,6 +9,7 @@ import { Section } from '@/components/ui/section';
 import { Award, GlobeIcon, MailIcon } from 'lucide-react';
 import { RESUME_DATA } from '@/data/resume-data';
 import Particles from '@/components/ui/particles';
+import Link from 'next/link';
 
 
 
@@ -115,6 +116,13 @@ export default async function AboutPage() {
               </li>
             ))}
         </Section>
+      </Section>
+      <Section>
+        <div className='p-10 flex items-center justify-center'>
+            <Link href={RESUME_DATA?.oldLink} className='underline text-gray-400 hover:text-black dark:hover:text-white'>
+              (구)Bobonb.blog
+            </Link>
+        </div>
       </Section>
     </main>
   );
