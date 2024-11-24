@@ -22,14 +22,14 @@ thumbnail: /posts/etc/android_frida_install/thumbnail.png
 ### Frida-server 다운로드
 
 ADB를 통해 설치할 기기의 아키텍쳐 확인 후 **frida releases**에서 아키텍쳐에 맞는 **frida-server** 다운 후 압축 해제
+https://github.com/frida/frida/releases
 
 ```powershell
 adb shell
-emu64xa:/ $ **getprop ro.product.cpu.abi**
-**x86_64**
+emu64xa:/ $ getprop ro.product.cpu.abi
+x86_64
 ```
 
-[Releases · frida/frida](https://github.com/frida/frida/releases)
 
 ### Frida-server 권한 설정 및 실행
 
