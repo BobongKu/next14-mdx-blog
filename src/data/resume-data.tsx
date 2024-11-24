@@ -22,5 +22,6 @@ export const RESUME_DATA = {
   },
   skills: ['Web Hack', 'Mobile Hack', 'Reversing', 'Spring Boot', 'Django', 'Flask', 'Next.js', 'Weight Training'],
   awards:['2020 대학정보보호동아리 공로상','2023 사이버호남컨퍼런스 웹 취약점 대회 장려상',],
-  team : 'SOTI(Security Over Tech&Info)'
+  team : 'SOTI(Security Over Tech&Info)',
+  bucketlist:['정보보안기사 취득', 'Defcon 본선 진출', 'CVE 10개 등록', 'BenchPress 1RM 120Kg', 'Offensive Security Master']
 } as const;

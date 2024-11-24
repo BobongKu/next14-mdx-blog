@@ -106,7 +106,7 @@ export const getCategoryDetailList = async () => {
     count,
   }));
 
-  return detailList;
+  return detailList.sort((a, b) => a.publicName.localeCompare(b.publicName));
 };
 
 // post 상세 페이지 내용 조회

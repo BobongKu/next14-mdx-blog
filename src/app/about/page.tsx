@@ -116,6 +116,14 @@ export default async function AboutPage() {
               </li>
             ))}
         </Section>
+        <Section>
+          <h2 className='text-2xl font-bold'>Bucket List</h2>
+            {RESUME_DATA?.bucketlist.map((bucketlist)=>(
+              <li key={bucketlist} className='text-pretty leading-8 text-muted-foreground print:text-[12px]'>
+                {bucketlist}
+              </li>
+            ))}
+        </Section>
       </Section>
       <Section>
         <div className='p-10 flex items-center justify-center'>
