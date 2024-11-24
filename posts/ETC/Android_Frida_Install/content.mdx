@@ -1,0 +1,88 @@
+---
+title: Android Frida 설치 및 연동
+desc: Android Frida 설치 및 연동
+date: 2024-11-24
+thumbnail: /posts/etc/android_frida_install/thumbnail.png
+---
+
+## Frida란?
+
+대표적으로 사용되는 안드로이드 리버싱툴이다.
+
+파이썬 기반으로 동작한다. 
+
+### 주요기능
+
+- 앱 디버깅
+- 함수 후킹
+- 실시간 트래픽 스니핑
+- 루팅이 되지 않은 기기에서 사용가능
+- 복호화 기능
+
+### Frida-server 다운로드
+
+ADB를 통해 설치할 기기의 아키텍쳐 확인 후 **frida releases**에서 아키텍쳐에 맞는 **frida-server** 다운 후 압축 해제
+
+```powershell
+adb shell
+emu64xa:/ $ **getprop ro.product.cpu.abi**
+**x86_64**
+```
+
+[Releases · frida/frida](https://github.com/frida/frida/releases)
+
+### Frida-server 권한 설정 및 실행
+
+압축 해제한 파일을 adb를 통해 push 한 후 권한 설정 뒤 백그라운드로 실행
+
+```powershell
+adb push frida-server /data/local/tmp
+adb shell
+adb su
+adb cd /data/local/tmp
+chmod 777 frida-server
+./frida-server & //백그라운드로 frida-server 실행
+ps -ef | grep frida //실행 확인
+```
+
+
+> 💡 만약 frida-server가 정상적으로 실행되지 않을 경우 frida-server 버전을 낮춰서 진행해보자
+
+
+### Frida 연결
+
+cmd에 pip를 통해 **frida,frida-tools** 패키지 설치 후 연결 확인
+
+```powershell
+pip install frida
+pip install objection
+firda-ps -U // 연결 확인
+```
+
+정상적으로 설치 및 연결 시 아래와 같이 기기에 설치되어 있는 앱 목록이 표시됨
+
+```powershell
+PS C:\Users\Bobong> frida-ps -U
+ PID  Name
+----  ----------------------------------------------------------
+6066  Chrome
+1940  Google
+3145  Magisk
+1961  Messages
+6001  Phone
+6000  Photos
+1418  SIM Toolkit
+5586  Settings
+ 488  adbd
+ 250  android.hardware.atrace@1.0-service
+ 392  android.hardware.audio.service
+ 393  android.hardware.authsecret@1.0-service
+ 570  android.hardware.biometrics.face@1.0-service.example
+ 571  android.hardware.biometrics.fingerprint@2.1-service
+ 394  android.hardware.bluetooth@1.1-service.btlinux
+ 395  android.hardware.camera.provider@2.4-service_64
+ 396  android.hardware.camera.provider@2.7-service-google
+ 398  android.hardware.cas@1.2-service
+ 403  android.hardware.contexthub@1.1-service.mock
+ ...
+```
