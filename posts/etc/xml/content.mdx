@@ -1,0 +1,125 @@
+---
+title: XML
+desc: What is XML?
+date: 2024-11-09
+thumbnail: /posts/etc/xml/thumbnail.png
+---
+
+## What's XML?
+
+XML은 Extensible Markup Language의 약자입니다. 한마디로 다목적 마크업 언어이다.
+
+XML은 인터넷이 연결된 서비스끼리 데이터를 용이하게 전달하기 위해 개발되었다.
+
+XML은 웹사이트, 데이터베이스, SOAP 통신 프로토콜 등 많은 곳에서 사용된다.
+
+## XML의 선언
+
+XML 문서는 자신에 대한 정보를 일부 선언하는 것으로 시작된다.
+
+`<?xml version=”1.0” encoding=”UTF-8” ?>` 와 같이 선언된다.
+
+## XML의 문법
+
+HTML과 같이 태그 형식의 문법을 사용한다.
+
+**태그에는 대소문자가 다르면 다른 요소로 인식한다.**
+
+**XML은 띄어쓰기를 인식한다.**
+
+## XML의 간단한 예시
+
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<note>
+	<name>
+		<firstname>CHOI</firstname>
+		<secondname>BOKYU</secondname>
+	</name>
+</note>
+```
+
+## XML의 Entity
+
+엔티티는 XML에서 특정 문자를 대체하는 역할을 합니다. 
+
+엔티티는 일반적으로 `&`로 시작하고 `;`로 끝나는 이름으로 표현됩니다. 
+
+XML에서는 아래와 같이 내장 엔티티를 지원합니다.
+
+1. **`&amp;`**: & (ampersand) 문자를 나타냅니다.
+2. **`&lt;`**: < (less than) 문자를 나타냅니다.
+3. **`&gt;`**: > (greater than) 문자를 나타냅니다.
+4. **`&quot;`**: " (double quote) 문자를 나타냅니다.
+5. **`&apos;`**: ' (apostrophe 또는 single quote) 문자를 나타냅니다.
+
+`&#61;` = a 와 같이 hex을 통해서 문자를 표기 할 수 있습니다.
+
+`<!ENTITY ADDRESS “8.8.8.8”>` 라고 선언하고 `&ADDRESS;` 로 참조해서 사용할 수 있습니다.
+
+엔티티는 외부 데이터를 가져와서 참조시킬 수 있습니다.
+
+```xml
+<?xml version="1.0"?>
+<!DOCTYPE example [
+    <!ENTITY localFile SYSTEM "file:///path/to/externalFile.txt">
+    <!ENTITY externalResource SYSTEM "https://example.com/resource.txt">
+]>
+<example>
+    <content>
+        Local File Content: &localFile;
+        <br/>
+        External Resource Content: &externalResource;
+    </content>
+</example>
+```
+
+## XML의 DTD
+
+Document Type Definition의 약자로 XML의 구조를 정의하고 검사하는 방법을 제공합니다.
+
+또한 DTD에도 ENTITY 선언이 가능합니다.
+
+아래는 DTD의 사용 예시입니다.
+
+```xml
+<?xml version="1.0"?>
+<!DOCTYPE addressbook SYSTEM "addressbook.dtd">
+<!DOCTYPE test [!ENTITY testing "test"]>
+<addressbook>
+    <contact id="1">
+        <name>John Doe</name>
+        <email>john@example.com</email>
+        <phone>123-456-7890</phone>
+    </contact>
+    <contact id="2">
+        <name>&admin;</name>
+        <email>jane@example.com</email>
+        <phone>987-654-3210</phone>
+    </contact>
+</addressbook>
+<test>
+		<bar>&testing;</bar>
+</test>
+```
+
+```xml
+<!ELEMENT addressbook (contact+)>
+<!ELEMENT contact (name, email, phone)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT email (#PCDATA)>
+<!ELEMENT phone (#PCDATA)>
+<!ATTLIST contact
+    id ID #REQUIRED
+>
+<!ENTITY admin "admin">
+```
+
+XML파일이 DTD에 준수하는지 확인할 수 있습니다. 만일 구조가 일치하지 않다면 오류 메세지를 내보냅니다.
+
+>💡 **(#PCDATA)**
+>`<!ELEMENT name (#PCDATA)>` 이런식으로 elment 선언이 되었다면
+>element name의 #PCDATA는 텍스트 데이터를 의미합니다.
+
+DTD 내부에서만 ENTITY를 사용할 땐 파라미터 ENTITY를 사용해야 된다.
+

