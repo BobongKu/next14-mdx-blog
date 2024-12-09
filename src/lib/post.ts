@@ -12,7 +12,7 @@ const POSTS_PATH = path.join(process.cwd(), BASE_PATH);
 // 모든 MDX 파일 조회
 export const getPostPaths = (category?: string) => {
   const folder = category || '**';
-  const postPaths: string[] = sync(`${POSTS_PATH}/${folder}/**/*.mdx`);
+  const postPaths: string[] = sync(`${POSTS_PATH}/${folder}/**/*.mdx`.replace(/\\/g, '/'));
   return postPaths;
 };
 
@@ -29,8 +29,9 @@ const parsePost = async (postPath: string): Promise<Post> => {
 // MDX의 개요 파싱
 // url, cg path, cg name, slug
 export const parsePostAbstract = (postPath: string) => {
-  const filePath = postPath
-    .slice(postPath.indexOf(BASE_PATH))
+  const normalizedPath = postPath.replace(/\\/g, '/');
+  const filePath = normalizedPath
+    .slice(normalizedPath.indexOf(BASE_PATH))
     .replace(`${BASE_PATH}/`, '')
     .replace('.mdx', '');
   const [categoryPath, slug] = filePath.split('/');
@@ -84,8 +85,8 @@ export const getSitemapPostList = async () => {
 export const getAllPostCount = async () => (await getPostList()).length;
 
 export const getCategoryList = () => {
-  const cgPaths: string[] = sync(`${POSTS_PATH}/*`);
-  const cgList = cgPaths.map((path) => path.split('/').slice(-1)?.[0]);
+  const cgPaths: string[] = sync(`${POSTS_PATH}/*`.replace(/\\/g, '/'));
+  const cgList = cgPaths.map((path) => path.replace(/\\/g, '/').split('/').slice(-1)?.[0]);
   return cgList;
 };
 
