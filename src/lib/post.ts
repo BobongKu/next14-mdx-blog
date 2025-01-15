@@ -35,9 +35,11 @@ export const parsePostAbstract = (postPath: string) => {
     .replace(`${BASE_PATH}/`, '')
     .replace('.mdx', '');
   const [categoryPath, slug] = filePath.split('/');
-  const url = `/post/${categoryPath}/${slug}`;
+  // 언더스코어를 %20으로 변환
+  const processedSlug = slug.replace(/_/g, '%20');
+  const url = `/post/${categoryPath}/${processedSlug}`;
   const categoryPublicName = getCategoryPublicName(categoryPath);
-  return { url, categoryPath, categoryPublicName, slug };
+  return { url, categoryPath, categoryPublicName, slug: processedSlug };
 };
 
 // MDX detail
@@ -112,9 +114,12 @@ export const getCategoryDetailList = async () => {
 
 // post 상세 페이지 내용 조회
 export const getPostDetail = async (category: string, slug: string) => {
-  const filePath = `${POSTS_PATH}/${category}/${slug}/content.mdx`;
-  const detail = await parsePost(filePath);
-  return detail;
+  // 파일 이름에서 %20을 제거하여 원래 파일 경로를 찾도록 수정합니다.
+  const tempPath = `/posts/${category}/${slug}.mdx`;
+  const { url, categoryPath, categoryPublicName, slug: transformedSlug } = parsePostAbstract(tempPath);
+const filePath = `${POSTS_PATH}/${category}/${transformedSlug.replace(/%20/g, '_')}/content.mdx`;
+const detail = await parsePost(filePath);
+return detail;
 };
 
 export const parseToc = (content: string): HeadingItem[] => {
