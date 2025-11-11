@@ -10,13 +10,16 @@ import { baseDomain } from '@/config/const';
 import { getPostDetail, getPostPaths, parsePostAbstract, parseToc } from '@/lib/post';
 
 type Props = {
-  params: { category: string; slug: string };
+  // [수정] params를 Promise로 감싸줍니다. (Next.js 15+ 방식)
+  params: Promise<{ category: string; slug: string }>;
 };
 
 // 허용된 param 외 접근시 404
 export const dynamicParams = false;
 
-export async function generateMetadata({ params: { category, slug } }: Props): Promise<Metadata> {
+// [수정] 전체 props를 받고, 내부에서 props.params를 await 합니다.
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const { category, slug } = await props.params; // 수정된 부분
   const post = await getPostDetail(category, slug);
 
   const title = `${post.title} | Bobong`;
@@ -50,7 +53,9 @@ export function generateStaticParams() {
   return paramList;
 }
 
-const PostDetail = async ({ params: { category, slug } }: Props) => {
+// [수정] 전체 props를 받고, 내부에서 props.params를 await 합니다.
+const PostDetail = async (props: Props) => {
+  const { category, slug } = await props.params; // 수정된 부분
   const post = await getPostDetail(category, slug);
   const toc = parseToc(post.content);
   return (

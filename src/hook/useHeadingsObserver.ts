@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 
 export const useHeadingsObserver = (query: string) => {
-  const observer = useRef<IntersectionObserver>();
+  // [수정] 타입을 | null 로 변경하고, (null)을 인자로 전달합니다.
+  const observer = useRef<IntersectionObserver | null>(null);
   const [activeIdList, setActiveIdList] = useState<string[]>([]);
   const [tempId, setTempId] = useState('');
 

@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import React, { PropsWithChildren } from 'react'; // [수정] React를 기본 import로 추가
 
 import * as Icon from './Icons';
 import { cn } from '@/lib/utils';
@@ -12,7 +12,7 @@ interface CalloutProps extends PropsWithChildren {
 
 interface IconType {
   [key: string]: {
-    icon: () => JSX.Element;
+    icon: () => React.ReactElement; // [수정] JSX.Element -> React.ReactElement
     boxClass: string;
   };
 }
