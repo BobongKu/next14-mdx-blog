@@ -1,5 +1,4 @@
 // src/components/post_list/CategoryButton.tsx
-
 'use client';
 
 import { TransitionLink } from '../common/TransitionLink';
@@ -44,7 +43,11 @@ export const CategoryButton = ({
           'category-pixel-card',
           // 2. 기본 레이아웃
           'relative inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium',
-          'h-9 px-3 bg-opacity-0', // 크기
+          'h-9 px-3', // 'bg-opacity-0' 제거
+          // isCurrent에 따라 스타일 분기
+          isCurrent
+            ? 'bg-primary text-primary-foreground current-category-glow' // 선택됨
+            : 'bg-opacity-0' // 선택 안됨
         )}
         style={{ '--active-color': colors.active } as React.CSSProperties}
       >
@@ -53,7 +56,7 @@ export const CategoryButton = ({
           data-speed='35'
           data-colors={colors.palette}
           data-no-focus={true}
-          // [수정] isCurrent가 true이면 픽셀 캔버스 숨김
+          // isCurrent가 true이면 픽셀 캔버스 숨김
           className={cn(
             'absolute inset-0 z-10',
             isCurrent && 'opacity-0'
