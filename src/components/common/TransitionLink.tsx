@@ -6,8 +6,10 @@ import { useRouter } from "next/navigation"
 
 
 interface TransitionLinkProps extends LinkProps {
-    children: ReactNode
-    href: string
+    children: ReactNode;
+    href: string;
+    className?: string;
+    style?: React.CSSProperties;
 }
 
 function sleep(ms: number): Promise<void> {
@@ -17,6 +19,8 @@ function sleep(ms: number): Promise<void> {
 export const TransitionLink = ({
     children,
     href,
+    className,
+    style,
     ...props
 }: TransitionLinkProps) => {
     const router = useRouter()
@@ -37,10 +41,14 @@ export const TransitionLink = ({
     }
 
     return (
-        <Link 
-        onClick={handleTransition}
-        href={href} {...props}>
+        <Link
+            onClick={handleTransition}
+            href={href}
+            className={className}
+            style={style}
+            {...props}
+        >
             {children}
         </Link>
-    )
+    );
 }

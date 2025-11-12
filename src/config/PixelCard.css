@@ -10,6 +10,9 @@
   --light-surface-shadow: #f0f0f0; /* ::before 그림자 */
   --light-bg: #ffffff; /* 흰색 배경 */
   --light-footer-text: #6B7280; /* text-gray-500 */
+  /* 선택 상태에서 픽셀 캔버스를 반전시킬지 여부 (1 = invert, 0 = no invert)
+     기본: 라이트 모드에서 반전(대비를 위해), 다크 모드에서는 비반전 */
+  --selected-invert: 1;
 }
 
 .dark {
@@ -20,6 +23,8 @@
   --surface-2: #27272a;
   --surface-3: #52525b;
   --dark-footer-text: #9CA3AF; /* text-gray-400 */
+  /* 다크 모드에서는 선택 시 반전을 끔 (이미 다크에 맞는 색상) */
+  --selected-invert: 0;
 }
 
 /* --- [수정] 기본 스타일을 라이트 모드로 변경 --- */
@@ -29,14 +34,14 @@
   display: grid;
   grid-template-areas: "card";
   place-items: center;
-  min-height: 150px;
+  min-height: 150px; /* PostCard를 위한 기본 높이 */
   height: 100%;
-  border: 1px solid var(--light-surface-2); /* 라이트 모드 테두리 */
+  border: 1px solid var(--light-surface-2);
   isolation: isolate;
-  transition: border-color 200ms var(--ease-out);
+  transition: border-color 200ms var(--ease-out), box-shadow 800ms var(--ease-in-out);
   user-select: none;
-  border-radius: 0.375rem; /* rounded-md */
-  background-color: var(--light-bg); /* 라이트 모드 배경 */
+  border-radius: 0.375rem;
+  background-color: var(--light-bg);
 }
 
 /* --- [수정] 다크 모드 스타일을 .dark로 래핑 --- */
@@ -126,13 +131,7 @@
   display: flex;
   justify-content: space-between;
   gap: 0.75rem;
-  font-size: 0.875rem; /* text-sm */
-  /* color: var(--light-footer-text); */ /* [삭제] title과 동일하게 동작하도록 삭제 */
-}
-
-/* 다크 모드 .card-footer */
-.dark .card-footer {
-  /* color: var(--dark-footer-text); */ /* [삭제] title과 동일하게 동작하도록 삭제 */
+  font-size: 0.875rem;
 }
 
 .card-footer .icon-text {
@@ -148,56 +147,167 @@
   outline: 5px auto -webkit-focus-ring-color;
 }
 
-.card:where(:hover, :focus-within) {
-  border-color: var(--active-color, var(--light-fg)); /* 라이트 모드 호버 */
-  transition: border-color 800ms var(--ease-in-out);
-  /* 기존 hover:shadow-xl 효과 */
+/* 카드 호버 효과 통합 */
+.card:where(:hover, :focus-within),
+.category-pixel-card:where(:hover, :focus-within) {
+  border-color: var(--active-color, var(--light-fg));
   box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
 /* 다크 모드 호버 */
-.dark .card:where(:hover, :focus-within) {
+.dark .card:where(:hover, :focus-within),
+.dark .category-pixel-card:where(:hover, :focus-within) {
   border-color: var(--active-color, var(--fg));
 }
 
 
-/* ▼ [수정] 이 블록을 호버 블록보다 위로 이동시켰습니다. */
+/* PostCard 텍스트 색상 */
 .card .card-title,
-.card-content > div:first-child > div:first-child, /* [추가] 카테고리 */
-.card-footer /* [추가] 날짜/시간 */ {
-  /* color: var(--active-color, var(--light-fg)); */ /* [수정] 라이트 모드 기본값을 카테고리 색상으로 */
-  color: var(--light-fg); /* [수정] 라이트 모드 기본값을 검은색/기본값으로 변경 */
-  
-  /* transition 설정 */
+.card-content > div:first-child > div:first-child, /* 카테고리 */
+.card-footer /* 날짜/시간 */ {
+  color: var(--light-fg); 
   transition: color 300ms var(--ease-out);
 }
 
-
+/* PostCard 텍스트 색상 (Dark) */
 .dark .card .card-title,
-.dark .card-content > div:first-child > div:first-child, /* [추가] 카테고리 */
-.dark .card-footer /* [추가] 날짜/시간 */ {
+.dark .card-content > div:first-child > div:first-child, 
+.dark .card-footer {
   color: var(--fg);
 }
 
+/* PostCard 텍스트 호버 색상 */
 .card:where(:hover, :focus-within) .card-title,
-.card:where(:hover, :focus-within) .card-content > div:first-child > div:first-child, /* [추가] 카테고리 */
-.card:where(:hover, :focus-within) .card-footer /* [추가] 날짜/시간 */ {
-  /* color: var(--light-fg); */ /* [수정] 라이트 모드 호버 시 검은색 */
-  color: var(--active-color, var(--light-fg)); /* [수정] 라이트 모드 호버 시 카테고리 색상으로 변경 */
+.card:where(:hover, :focus-within) .card-content > div:first-child > div:first-child, 
+.card:where(:hover, :focus-within) .card-footer {
+  color: var(--active-color, var(--light-fg)); 
   transition: color 300ms var(--ease-in-out);
 }
 
+/* PostCard 텍스트 호버 색상 (Dark) */
 .dark .card:where(:hover, :focus-within) .card-title,
-.dark .card:where(:hover, :focus-within) .card-content > div:first-child > div:first-child, /* [추가] 카테고리 */
-.dark .card:where(:hover, :focus-within) .card-footer /* [추가] 날짜/시간 */ {
-  color: var(--active-color, var(--fg)); /* 다크 모드 호버 */
+.dark .card:where(:hover, :focus-within) .card-content > div:first-child > div:first-child,
+.dark .card:where(:hover, :focus-within) .card-footer {
+  color: var(--active-color, var(--fg));
 }
 
 
 .card:where(:hover, :focus-within)::before {
-  opacity: 0;
+  opacity: 1;
 }
 
 .card:where(:hover, :focus-within)::after {
   opacity: 1;
+}
+.category-pixel-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--light-surface-2);
+  isolation: isolate;
+  transition: border-color 200ms var(--ease-out), box-shadow 800ms var(--ease-in-out);
+  user-select: none;
+}
+
+/* 'ghost' variant (not current)일 때만 기본 배경색 적용 */
+.category-pixel-card:not(.bg-primary) {
+  background-color: var(--light-bg);
+}
+.dark .category-pixel-card:not(.bg-primary) {
+  background-color: var(--bg);
+}
+
+/* ::before, ::after pseudo-elements for glow/shadow */
+.category-pixel-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at bottom left,
+    transparent 55%,
+    var(--light-surface-shadow)
+  );
+  box-shadow: var(--light-bg) -0.5cqi 0.5cqi 2.5cqi inset;
+  pointer-events: none;
+  transition: opacity 900ms var(--ease-out);
+  z-index: 20; /* On top of canvas (z-10), behind text (z-30) */
+}
+
+.dark .category-pixel-card::before {
+  background: radial-gradient(
+    circle at bottom left,
+    transparent 55%,
+    var(--surface-1)
+  );
+  box-shadow: var(--bg) -0.5cqi 0.5cqi 2.5cqi inset;
+}
+
+.category-pixel-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  aspect-ratio: 1;
+  background: radial-gradient(circle, var(--light-bg), transparent 65%);
+  opacity: 0;
+  transition: opacity 800ms var(--ease-out);
+  z-index: 20; /* On top of canvas (z-10), behind text (z-30) */
+}
+
+.dark .category-pixel-card::after {
+  background: radial-gradient(circle, var(--bg), transparent 65%);
+}
+
+/* --- CategoryButton 호버 효과 --- */
+
+/* 호버 시 테두리 색상 변경 */
+.category-pixel-card:where(:hover, :focus-within) {
+  border-color: var(--active-color, var(--light-fg));
+  transition: border-color 800ms var(--ease-in-out);
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+.dark .category-pixel-card:where(:hover, :focus-within) {
+  border-color: var(--active-color, var(--fg));
+}
+
+/* 호버 시 ::before, ::after 숨김 (픽셀 보이도록) */
+.category-pixel-card:where(:hover, :focus-within)::before {
+  opacity: 0;
+}
+
+.category-pixel-card:where(:hover, :focus-within)::after {
+  opacity: 1;
+}
+
+/* 1. 'ghost' 버튼 (isCurrent=false) 텍스트 기본 색상 */
+/* (a.category-pixel-card > span.z-30) */
+.category-pixel-card > span.z-30 {
+  color: var(--light-fg);
+  transition: color 300ms var(--ease-out);
+}
+.dark .category-pixel-card > span.z-30 {
+  color: var(--fg);
+}
+
+/* 2. 카드 호버 시 'ghost' 버튼 텍스트 색상 변경 */
+.category-pixel-card:where(:hover, :focus-within) > span.z-30 {
+  color: var(--active-color, var(--light-fg));
+  transition: color 300ms var(--ease-in-out);
+}
+.dark .category-pixel-card:where(:hover, :focus-within) > span.z-30 {
+  color: var(--active-color, var(--fg));
+}
+
+/* 3. 'default' 버튼(isCurrent=true) 텍스트 색상 유지 (Tailwind .text-primary-foreground) */
+.category-pixel-card.text-primary-foreground > span.z-30 {
+  color: hsl(var(--primary-foreground));
+}
+.dark .category-pixel-card.text-primary-foreground > span.z-30 {
+  color: hsl(var(--primary-foreground));
+}
+.category-pixel-card.text-primary-foreground:where(:hover, :focus-within) > span.z-30 {
+  color: hsl(var(--primary-foreground));
+}
+.dark .category-pixel-card.text-primary-foreground:where(:hover, :focus-within) > span.z-30 {
+  color: hsl(var(--primary-foreground));
 }
